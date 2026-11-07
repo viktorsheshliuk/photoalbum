@@ -62,3 +62,7 @@ ul.dropdown-address {
 .dropdown-address li a:hover {
   color: white;
 }
+.select2-container--default .select2-results__option--highlighted[aria-selected] .np-item-hint{
+    background-color: #5897fb;
+    color: white;
+}
