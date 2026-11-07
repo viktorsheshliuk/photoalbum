@@ -1,0 +1,131 @@
+name: Deploy OpenCart 3 via FTP
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: stage-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy changed files
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+
+      - name: Get changed files
+        run: |
+          BEFORE="${{ github.event.before }}"
+
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "First push to the branch — deploying all repository files"
+            git ls-files > changed_files.txt
+          else
+            git diff --name-only "$BEFORE" "${{ github.sha }}" > changed_files.txt
+          fi
+
+          echo "Changed files:"
+          cat changed_files.txt
+
+
+      - name: Prepare deploy list
+        run: |
+
+          printf '%s\n' \
+          '^\.git' \
+          '^\.github' \
+          '^README\.md' \
+          '^LICENSE' \
+          '^build/' \
+          '^robots\.txt' \
+          '^\.htaccess' \
+          '^\.htpasswd' \
+          '^config\.php' \
+          '^admin/config\.php' \
+          '^php\.ini' \
+          '^image/' \
+          '^storage/cache/' \
+          '^storage/logs/' \
+          '^storage/session/' \
+          '^storage/upload/' \
+          '^storage/download/' \
+          '^storage/modification/' \
+          '^vqmod/logs/' \
+          '^vqmod/vqcache/' \
+          '^install/' \
+          '.*\.log$' \
+          '.*\.ocmod\.xml$' \
+          > exclude.txt
+
+
+          grep -v -E -f exclude.txt changed_files.txt > deploy_files.txt || true
+
+
+          echo "Files for deploy:"
+          cat deploy_files.txt
+
+
+          echo "Total files:"
+          wc -l deploy_files.txt
+
+
+
+      - name: Deploy via FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          TARGET_DIR: ${{ secrets.TARGET_DIR }}
+
+        run: |
+
+          if [ ! -s deploy_files.txt ]; then
+            echo "No files to deploy"
+            exit 0
+          fi
+
+
+          echo "set ftp:ssl-allow no" > lftp_commands.txt
+          echo "set ftp:sync-mode off" >> lftp_commands.txt
+          echo "set net:timeout 20" >> lftp_commands.txt
+          echo "set net:max-retries 3" >> lftp_commands.txt
+          echo "set net:reconnect-interval-base 5" >> lftp_commands.txt
+
+
+          while IFS= read -r file
+          do
+
+            dirname=$(dirname "$file")
+
+            echo "mkdir -p \"$TARGET_DIR/$dirname\"" >> lftp_commands.txt
+
+            echo "put \"$file\" -o \"$TARGET_DIR/$file\"" >> lftp_commands.txt
+
+          done < deploy_files.txt
+
+
+          echo "quit" >> lftp_commands.txt
+
+
+          echo "FTP commands:"
+          cat lftp_commands.txt
+
+
+          lftp \
+            -u "$FTP_USER","$FTP_PASSWORD" \
+            "$FTP_HOST" < lftp_commands.txt
