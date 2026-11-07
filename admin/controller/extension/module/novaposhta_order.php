@@ -13,9 +13,11 @@ class ControllerExtensionModuleNovaposhtaOrder extends Controller {
             $data['order_id'] = $order_id;
 
             // получаем название и ref отделения и города
-            if (isset($order_info['novaposhta_cn_ref'])){
-                $data['novaposhta_cn_ref'] = $order_info['novaposhta_cn_ref'];
-                $warehouse = $this->model_extension_shipping_novaposhta->getWarehouseByRef($order_info['novaposhta_cn_ref']);
+            $order_ref = $this->model_extension_shipping_novaposhta->getOrderWarehouseRef($order_id);
+            $data['novaposhta_cn_ref'] = $order_ref;
+
+            if ($order_ref !== ''){
+                $warehouse = $this->model_extension_shipping_novaposhta->getWarehouseByRef($order_ref);
                 
                 if($warehouse){
                     $data['warehouse_name'] = $warehouse['Description'];
@@ -26,8 +28,6 @@ class ControllerExtensionModuleNovaposhtaOrder extends Controller {
                     }
                 }
 
-            } else {
-                $data['novaposhta_cn_ref'] = '';
             }
             
             // Данные получателя из заказа

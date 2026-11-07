@@ -41,6 +41,20 @@ class ControllerExtensionModuleShippingdata extends Controller {
 					'address'  => $warehouse['ShortAddress']
 				);
 			}
+		} elseif ($action == 'save') {
+			$ref = isset($this->request->get['ref']) ? strtolower(trim((string)$this->request->get['ref'])) : '';
+
+			// Запоминаем выбранное отделение/почтомат в сессии, чтобы записать его в заказ при оформлении
+			if ($ref !== '' && $this->model_extension_module_shippingdata->isWarehouseRef($ref)) {
+				$this->session->data['novaposhta_cn_ref'] = $ref;
+			} else {
+				unset($this->session->data['novaposhta_cn_ref']);
+			}
+
+			$this->response->addHeader('Content-Type: application/json; charset=utf-8');
+			$this->response->setOutput(json_encode(array('success' => true)));
+
+			return;
 		} elseif ($action == 'resolve') {
 			$name    = isset($this->request->get['city']) ? (string)$this->request->get['city'] : '';
 			$zone_id = isset($this->request->get['zone_id']) ? (int)$this->request->get['zone_id'] : 0;

@@ -805,6 +805,19 @@ class ModelExtensionShippingNovaposhta extends Model {
     }
 
     /**
+     * Ref отделения/почтомата, сохранённый в заказе (поле novaposhta_cn_ref)
+     */
+    public function getOrderWarehouseRef($order_id) {
+        $query = $this->db->query("SELECT novaposhta_cn_ref FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$order_id . "' LIMIT 1");
+
+        if ($query->num_rows && !empty($query->row['novaposhta_cn_ref'])) {
+            return $query->row['novaposhta_cn_ref'];
+        }
+
+        return '';
+    }
+
+    /**
      * Зміна статусу замовлення без сповіщень та коментарів
      */
     public function setOrderStatus($order_id, $order_status_id) {

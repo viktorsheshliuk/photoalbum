@@ -1364,6 +1364,19 @@ class ControllerCheckoutSimpleCheckout extends SimpleController {
 
         $this->session->data['order_id'] = $order_id;
 
+        /* START Shipping Data */
+        $this->load->model('extension/module/shippingdata');
+
+        // Сохраняем Ref выбранного отделения/почтомата в заказе (для создания ТТН в админке)
+        if ($order_id) {
+            $this->model_extension_module_shippingdata->saveOrderWarehouseRef($order_id, array(
+                'code'    => isset($data['shipping_code']) ? $data['shipping_code'] : '',
+                'city'    => isset($data['shipping_city']) ? $data['shipping_city'] : '',
+                'address' => isset($data['shipping_address_1']) ? $data['shipping_address_1'] : ''
+            ));
+        }
+        /* END Shipping Data */
+
         $this->simplecheckout->saveCustomFields(array('customer', 'payment_address', 'payment', 'shipping_address', 'shipping'), 'order', $order_id);
 
         $simple_cart_id = !empty($this->session->data['simple_cart_id']) ? $this->session->data['simple_cart_id'] : 0;

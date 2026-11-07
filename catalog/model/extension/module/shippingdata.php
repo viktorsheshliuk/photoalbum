@@ -335,6 +335,83 @@ class ModelExtensionModuleShippingdata extends Model {
 	}
 
 	/**
+	 * Ref отделения/почтомата, выбранного покупателем (UUID из справочника Новой Почты)
+	 */
+	public function isWarehouseRef($ref) {
+		$ref = strtolower(trim((string)$ref));
+
+		if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $ref)) {
+			return false;
+		}
+
+		$query = $this->db->query("SELECT `Ref` FROM `" . DB_PREFIX . "novaposhta_departments` WHERE `Ref` = '" . $this->db->escape($ref) . "' LIMIT 1");
+
+		return ($query->num_rows > 0);
+	}
+
+	/**
+	 * Записывает Ref выбранного отделения/почтомата в заказ
+	 *
+	 * @param int   $order_id номер заказа
+	 * @param array $order    код доставки, название города и адрес (описание отделения)
+	 */
+	public function saveOrderWarehouseRef($order_id, $order) {
+		$order_id = (int)$order_id;
+
+		$ref = isset($this->session->data['novaposhta_cn_ref']) ? strtolower(trim((string)$this->session->data['novaposhta_cn_ref'])) : '';
+
+		// Ref не должен переходить в следующий заказ
+		unset($this->session->data['novaposhta_cn_ref']);
+
+		if (!$order_id) {
+			return;
+		}
+
+		$code = isset($order['code']) ? (string)$order['code'] : '';
+
+		// Ref сохраняется только для доставки в отделение или почтомат
+		if ($code != 'novaposhta.department' && $code != 'novaposhta.parcelbox') {
+			return;
+		}
+
+		if ($ref === '' || !$this->isWarehouseRef($ref)) {
+			// Значение могло потеряться (перезагрузка страницы) — ищем отделение по адресу заказа
+			$ref = $this->findWarehouseRef(
+				isset($order['city']) ? $order['city'] : '',
+				isset($order['address']) ? $order['address'] : ''
+			);
+		}
+
+		if ($ref === '') {
+			return;
+		}
+
+		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET `novaposhta_cn_ref` = '" . $this->db->escape($ref) . "' WHERE `order_id` = '" . $order_id . "'");
+	}
+
+	/**
+	 * Ищет Ref отделения по названию города и описанию отделения (как оно сохраняется в адресе)
+	 */
+	private function findWarehouseRef($city, $address) {
+		$city    = trim((string)$city);
+		$address = trim((string)$address);
+
+		if ($city === '' || $address === '') {
+			return '';
+		}
+
+		foreach (array_slice($this->getCityByName($city), 0, 5) as $city_info) {
+			$query = $this->db->query("SELECT `Ref` FROM `" . DB_PREFIX . "novaposhta_departments` WHERE `CityRef` = '" . $this->db->escape($city_info['Ref']) . "' AND `Description` = '" . $this->db->escape($address) . "' LIMIT 1");
+
+			if ($query->num_rows) {
+				return $query->row['Ref'];
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Escapes the LIKE wildcards so the user input is searched literally
 	 */
 	private function escapeLike($value) {

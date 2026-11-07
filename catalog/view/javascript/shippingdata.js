@@ -147,6 +147,7 @@
 			city: $city[0],
 			address: $address.length ? $address[0] : null,
 			cityRef: '',
+			addressRef: '',
 			citySelect: null,
 			addressSelect: null
 		};
@@ -310,11 +311,40 @@
 		$select.on('select2:select', function (event) {
 			var item = event.params.data || {};
 
+			state[id].addressRef = item.id || '';
+
+			saveWarehouseRef(id);
+
 			setNativeValue($native, item.text || '');
 		});
 
 		$select.on('select2:clear', function () {
+			if (state[id]) {
+				state[id].addressRef = '';
+			}
+
+			saveWarehouseRef(id);
+
 			setNativeValue($native, '');
+		});
+	}
+
+	// Ref обраного відділення/поштомата надсилаємо на сервер, щоб зберегти його в замовленні
+	function saveWarehouseRef(id) {
+		var current = state[id];
+
+		if (!current || !getConfig()) {
+			return;
+		}
+
+		$.ajax({
+			url: getConfig().url,
+			data: {
+				action: 'save',
+				ref: current.addressRef || ''
+			},
+			dataType: 'json',
+			global: false
 		});
 	}
 
@@ -341,6 +371,8 @@
 		if (current.address && $(current.address).length) {
 			setNativeValue($(current.address), '');
 		}
+
+		saveWarehouseRef(id);
 	}
 
 	// Отримує Ref міста для вже збереженого значення у полі city
