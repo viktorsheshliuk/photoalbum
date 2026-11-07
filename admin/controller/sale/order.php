@@ -229,6 +229,7 @@ class ControllerSaleOrder extends Controller {
 				'order_id'      => $result['order_id'],
 				'customer'      => $result['customer'],
 				'order_status'  => $result['order_status'] ? $result['order_status'] : $this->language->get('text_missing'),
+				'track_number'  => $result['ttn'],
 				'total'         => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
 				'date_added'    => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'date_modified' => date($this->language->get('date_format_short'), strtotime($result['date_modified'])),
@@ -508,6 +509,7 @@ class ControllerSaleOrder extends Controller {
 			$data['shipping_zone_id'] = $order_info['shipping_zone_id'];
 			$data['shipping_custom_field'] = $order_info['shipping_custom_field'];
 			$data['shipping_method'] = $order_info['shipping_method'];
+			$data['track_number'] = isset($order_info['ttn']) ? $order_info['ttn'] : ''; 
 			$data['shipping_code'] = $order_info['shipping_code'];
 
 			// Products
@@ -1243,6 +1245,14 @@ class ControllerSaleOrder extends Controller {
 				$data['api_token'] = '';
 			}
 
+			$data['track_number'] = $order_info['ttn'];
+
+			$data['novaposhta_order'] = '';
+
+			if (in_array($order_info['shipping_code'], ['novaposhta.department', 'novaposhta.parcelbox', 'novaposhta.courier'])) {
+				$data['novaposhta_order'] = $this->load->controller('extension/module/novaposhta_order');
+			}
+
 			$data['header'] = $this->load->controller('common/header');
 			$data['column_left'] = $this->load->controller('common/column_left');
 			$data['footer'] = $this->load->controller('common/footer');
@@ -1919,7 +1929,7 @@ class ControllerSaleOrder extends Controller {
 				// Получаем track_number и сразу убираем пробелы по краям с помощью trim()
 	        	$track_number = isset($this->request->post['track_number']) ? trim($this->request->post['track_number']) : trim($this->request->get['track_number']);
 
-				$save_track = $this->db->query("UPDATE `" . DB_PREFIX . "order` SET track_number='" . $this->db->escape($track_number) . "' WHERE order_id = '" . (int)$order_id . "'");
+				//$save_track = $this->db->query("UPDATE `" . DB_PREFIX . "order` SET track_number='" . $this->db->escape($track_number) . "' WHERE order_id = '" . (int)$order_id . "'");
 
 				// 1. Проверяем, есть ли уже запись для этого заказа
 				$query =$this->db->query("SELECT `ttn_id` FROM `" . DB_PREFIX . "novaposhta_ttn` WHERE `order_id` = '" . (int)$order_id . "'");

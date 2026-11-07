@@ -1,0 +1,416 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-truck"></i> ТТН Новой Почты</h3>
+    </div>
+    <div class="panel-body">
+        {% if ttns %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ТТН</th>
+                            <th>Город</th>
+                            <th>Отделение</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ttn in ttns %}
+                        <tr>
+                            <td>{{ ttn.ttn }}</td>
+                            <td>{{ ttn.city_name }}</td>
+                            <td>{{ ttn.warehouse_name }}</td>
+                            <td>{{ ttn.date_added }}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteTtn({{ ttn.ttn_id }});">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        
+        <form id="novaposhta-ttn-form" class="form-horizontal">
+            <input type="hidden" name="order_id" value="{{ order_id }}" />
+            <input type="hidden" name="cargo_type" value="Cargo" />
+            <input type="hidden" name="payment_method" value="Cash" />
+            
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Город:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="city_search" id="city-search" placeholder="Поиск города..." class="form-control" value="{{ city_name }}"/>
+                            <input type="hidden" name="city_ref" id="city-ref" value="{{ city_ref }}" />
+                            <input type="hidden" name="city_name" id="city-name" value="{{ city_name }}" />
+                            <div id="city-results" class="list-group" style="position: absolute; z-index: 1000;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Отделение:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="warehouse_search" id="warehouse-search" 
+                                placeholder="Поиск отделения..." class="form-control" {% if not warehouse_name %}disabled{% endif %} value="{{ warehouse_name|e('html_attr') }}"/>
+                            <input type="hidden" name="warehouse_ref" id="warehouse-ref" value="{{ novaposhta_cn_ref }}" />
+                            <input type="hidden" name="warehouse_name" id="warehouse-name" value="{{ warehouse_name }}" />
+                            <div id="warehouse-results" class="list-group" style="position: absolute; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Получатель:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="recipient_name" value="{{ customer_name }}" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Телефон:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="recipient_phone" value="{{ customer_phone }}" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Тип доставки:</label>
+                        <div class="col-sm-8">
+                            <select name="service_type" class="form-control">
+                                <option value="WarehouseWarehouse">Склад-Склад</option>
+                                <option value="WarehouseDoors">Склад-Двери</option>
+                                <option value="DoorsWarehouse">Двери-Склад</option>
+                                <option value="DoorsDoors">Двери-Двери</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Плательщик:</label>
+                        <div class="col-sm-8">
+                            <select name="payer_type" class="form-control">
+                                <option value="Recipient">Получатель</option>
+                                <option value="Sender">Отправитель</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Вес (кг):</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="weight" value="2" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Оцен. стоимость:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="cost" value="{{ cost }}" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Кол-во мест:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="seats_amount" value="{{ seats_amount }}" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Наложка:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="cash_on_delivery" value="{{ cash_on_delivery }}" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Длина:</label>
+                            <div class="col-sm-2">
+                                <input type="text" name="length" value="" class="form-control" placeholder="26">
+                            </div>
+                            <label class="col-sm-1 control-label">Ширина:</label>
+                            <div class="col-sm-2">
+                                <input type="text" name="width" value="" class="form-control" class="form-control" placeholder="20">
+                            </div>    
+                            <label class="col-sm-1 control-label">Высота:</label>
+                            <div class="col-sm-2">
+                                <input type="text" name="height" value="" class="form-control" class="form-control" placeholder="15">
+                            </div>
+                        </div>    
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Объем. вес:</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="volume" value="" class="form-control" readonly/>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Описание:</label>
+                <div class="col-sm-10">
+                    <textarea name="description" class="form-control" rows="2">Фотоальбоми</textarea>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <button type="button" id="create-ttn" class="btn btn-primary"><i class="fa fa-truck"></i> Создать ТТН</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Поиск городов
+    $('#city-search').on('input', function() {
+        var search = $(this).val().trim();
+        
+        if (search.length >= 2) {
+            $.ajax({
+                url: 'index.php?route=extension/module/novaposhta_order/searchCities&user_token={{ user_token }}&search=' + encodeURIComponent(search),
+                type: 'GET',
+                dataType: 'json',
+                success: function(json) {
+                    var html = '';
+                    
+                    if (json.length > 0) {
+                        $.each(json, function(index, city) {
+                            html += '<a href="#" class="list-group-item city-item" data-ref="' + city.ref + '" data-name="' + city.name + '">' + city.name + '</a>';
+                        });
+                    } else {
+                        html = '<div class="list-group-item">Ничего не найдено</div>';
+                    }
+                    
+                    $('#city-results').html(html).show();
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.error(thrownError);
+                }
+            });
+        } else {
+            $('#city-results').hide();
+        }
+    });
+    
+    // Выбор города
+    $(document).on('click', '.city-item', function(e) {
+        e.preventDefault();
+        
+        var cityRef = $(this).data('ref');
+        var cityName = $(this).data('name');
+        
+        $('#city-search').val(cityName);
+        $('#city-ref').val(cityRef);
+        $('#city-name').val(cityName);
+        $('#city-results').hide();
+        
+        // Загрузка отделений
+        $.ajax({
+            url: 'index.php?route=extension/module/novaposhta_order/getWarehouses&user_token={{ user_token }}&city_ref=' + cityRef,
+            type: 'GET',
+            dataType: 'json',
+            success: function(json) {
+                var html = '<option value="">Выберите отделение</option>';
+                
+                $.each(json, function(index, warehouse) {
+                    html += '<option value="' + warehouse.ref + '">' + warehouse.name + '</option>';
+                });
+                
+                $('#warehouse-select').html(html).prop('disabled', false);
+            }
+        });
+    });
+    
+    // Поиск отделений
+    $('#warehouse-search').on('input', function() {
+        var search = $(this).val().trim();
+        var cityRef = $('#city-ref').val();
+        
+        if (search.length >= 1 && cityRef) {
+            $.ajax({
+                url: 'index.php?route=extension/module/novaposhta_order/searchWarehouses&user_token={{ user_token }}&city_ref=' + cityRef + '&search=' + encodeURIComponent(search),
+                type: 'GET',
+                dataType: 'json',
+                success: function(json) {
+                    var html = '';
+                    
+                    if (json.length > 0) {
+                        $.each(json, function(index, warehouse) {
+
+                            var warehouse_name = String(warehouse.name)
+                                .replace(/&/g, '&amp;')
+                                .replace(/"/g, '&quot;')
+                                .replace(/'/g, '&#39;');
+
+                            html += '<a href="#" class="list-group-item warehouse-item" data-ref="' + warehouse.ref + '" data-name="' + warehouse_name + '">' + warehouse_name + '</a>';
+                        });
+                    } else {
+                        html = '<div class="list-group-item">Ничего не найдено. Попробуйте другой номер или адрес.</div>';
+                    }
+                    
+                    $('#warehouse-results').html(html).show();
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.error(thrownError);
+                }
+            });
+        } else if (search.length === 0 && cityRef) {
+            // Если поле пустое, показываем первые отделения
+            $.ajax({
+                url: 'index.php?route=extension/module/novaposhta_order/getWarehouses&user_token={{ user_token }}&city_ref=' + cityRef,
+                type: 'GET',
+                dataType: 'json',
+                success: function(json) {
+                    var html = '';
+                    
+                    if (json.length > 0) {
+                        $.each(json, function(index, warehouse) {
+                            html += '<a href="#" class="list-group-item warehouse-item" data-ref="' + warehouse.ref + '" data-name="' + warehouse.name + '">' + warehouse.name + '</a>';
+                        });
+                    }
+                    
+                    $('#warehouse-results').html(html).show();
+                }
+            });
+        } else {
+            $('#warehouse-results').hide();
+        }
+    });
+
+// Выбор отделения
+$(document).on('click', '.warehouse-item', function(e) {
+    e.preventDefault();
+    
+    var warehouseRef = $(this).data('ref');
+    var warehouseName = $(this).data('name');
+    
+    $('#warehouse-search').val(warehouseName);
+    $('#warehouse-ref').val(warehouseRef);
+    $('#warehouse-name').val(warehouseName);
+    $('#warehouse-results').hide();
+});
+
+// Скрытие списка отделений при клике вне
+$(document).on('click', function(e) {
+    if (!$(e.target).closest('#warehouse-results').length) {
+        $('#warehouse-results').hide();
+    }
+});
+
+// Активация поиска отделений после выбора города
+$(document).on('click', '.city-item', function(e) {
+    e.preventDefault();
+    
+    var cityRef = $(this).data('ref');
+    var cityName = $(this).data('name');
+    
+    $('#city-search').val(cityName);
+    $('#city-ref').val(cityRef);
+    $('#city-name').val(cityName);
+    $('#city-results').hide();
+    
+    // Активируем поиск отделений
+    $('#warehouse-search').prop('disabled', false).val('').focus();
+    $('#warehouse-ref').val('');
+    $('#warehouse-name').val('');
+});
+    
+    // Создание ТТН
+    $('#create-ttn').on('click', function() {
+        $.ajax({
+            url: 'index.php?route=extension/module/novaposhta_order/createTtn&user_token={{ user_token }}',
+            type: 'POST',
+            data: $('#novaposhta-ttn-form').serialize(),
+            dataType: 'json',
+            beforeSend: function() {
+                $('#create-ttn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Создание...');
+            },
+            success: function(json) {
+                if (json.success) {
+                    alert(json.success);
+                    location.reload();
+                } else if (json.error) {
+                    alert('Ошибка: ' + json.error);
+                }
+            },
+            complete: function() {
+                $('#create-ttn').prop('disabled', false).html('<i class="fa fa-truck"></i> Создать ТТН');
+            }
+        });
+    });
+    
+    // Скрытие списка городов при клике вне
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#city-results').length) {
+            $('#city-results').hide();
+        }
+    });
+
+    document.addEventListener('input', function (e) {
+        if (['length', 'width', 'height'].includes(e.target.name)) {
+            const length = parseFloat(document.querySelector('input[name="length"]').value) || 0;
+            const width = parseFloat(document.querySelector('input[name="width"]').value) || 0;
+            const height = parseFloat(document.querySelector('input[name="height"]').value) || 0;
+            
+            const volumeInput = document.querySelector('input[name="volume"]');
+            
+            if (length > 0 && width > 0 && height > 0) {
+                const volumeWeight = (length * width * height) / 4000;
+                volumeInput.value = volumeWeight.toFixed(2);
+            } else {
+                volumeInput.value = '';
+            }
+        }
+    });
+});
+
+// Удаление ТТН
+function deleteTtn(ttn_id) {
+    if (confirm('Вы уверены, что хотите удалить эту ТТН?')) {
+        $.ajax({
+            url: 'index.php?route=extension/module/novaposhta_order/deleteTtn&user_token={{ user_token }}',
+            type: 'POST',
+            data: {ttn_id: ttn_id},
+            dataType: 'json',
+            success: function(json) {
+                if (json.success) {
+                    alert(json.success);
+                    location.reload();
+                }
+            }
+        });
+    }
+}
+</script>
