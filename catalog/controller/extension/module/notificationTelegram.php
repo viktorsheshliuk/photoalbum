@@ -10,6 +10,10 @@ class ControllerExtensionModuleNotificationTelegram extends Controller {
 		$this->load->model('setting/setting');
 		$setting = $this->model_setting_setting->getSetting('module_notificationTelegram');
 
+		if (isset($setting['module_notificationTelegram_status']) && $setting['module_notificationTelegram_status'] == 0) {
+			return;	// Module is disabled
+		}
+
 		if (isset($setting['module_notificationTelegram_order_alert'])) {
 			
 			$this->load->model('account/order');
@@ -28,6 +32,11 @@ class ControllerExtensionModuleNotificationTelegram extends Controller {
 	public function sendAccountAlert(&$route, &$data, &$output) {
 		$this->load->model('setting/setting');
 		$setting = $this->model_setting_setting->getSetting('module_notificationTelegram');
+
+		if (isset($setting['module_notificationTelegram_status']) && $setting['module_notificationTelegram_status'] == 0) {
+			return;	// Module is disabled
+		}
+
 		if (isset($setting['module_notificationTelegram_customer_alert'])) {
 
 			$message = $this->replaceMessage($setting['module_notificationTelegram_new_account_meassage'],$data[0]);
@@ -39,6 +48,11 @@ class ControllerExtensionModuleNotificationTelegram extends Controller {
 	public function sendReturnProductAlert(&$data,&$output) {
 		$this->load->model('setting/setting');
 		$setting = $this->model_setting_setting->getSetting('module_notificationTelegram');
+
+		if (isset($setting['module_notificationTelegram_status']) && $setting['module_notificationTelegram_status'] == 0) {
+			return;	// Module is disabled
+		}
+		
 		if (isset($setting['module_notificationTelegram_return_alert'])) {
 			
 			$message = "Return request \n ";

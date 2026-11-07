@@ -54,6 +54,23 @@
 {% endif %}
     {% if not ajax or (ajax and popup) %}
     <script type="text/javascript">
+        /* START Shipping Data */
+        window.NPSHIPPING = {
+            url: "{{ np_shipping_url }}",
+            texts: {
+                search_city: "{{ np_shipping_texts.search_city|escape('js') }}",
+                search_warehouse: "{{ np_shipping_texts.search_warehouse|escape('js') }}",
+                select_city_first: "{{ np_shipping_texts.select_city_first|escape('js') }}",
+                no_results: "{{ np_shipping_texts.no_results|escape('js') }}",
+                searching: "{{ np_shipping_texts.searching|escape('js') }}",
+                input_too_short: "{{ np_shipping_texts.input_too_short|escape('js') }}",
+                loading_more: "{{ np_shipping_texts.loading_more|escape('js') }}",
+                error_loading: "{{ np_shipping_texts.error_loading|escape('js') }}",
+                clear_selection: "{{ np_shipping_texts.clear_selection|escape('js') }}"
+            }
+        };
+        /* END Shipping Data */
+
         {% if popup %} 
             var simpleScriptsInterval = window.setInterval(function(){
                 if (typeof jQuery !== 'undefined' && jQuery.isReady) {
@@ -123,6 +140,12 @@
                 });
 
                 simplecheckout_{{ group }}.init();
+
+                /* START Shipping Data */
+                if (window.NPDelivery) {
+                    window.NPDelivery.refresh();
+                }
+                /* END Shipping Data */
                 
             }
         },0);

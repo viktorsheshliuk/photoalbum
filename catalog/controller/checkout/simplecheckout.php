@@ -9,9 +9,24 @@ include_once(DIR_SYSTEM . 'library/simple/simple_controller.php');
 class ControllerCheckoutSimpleCheckout extends SimpleController {
     private $_templateData = array();
 
+    /* START Shipping Data */
+    // Версия по времени изменения файла, чтобы браузер не держал старый JS в кеше
+    private function getShippingDataScript() {
+        $file = DIR_APPLICATION . 'view/javascript/shippingdata.js';
+        $version = is_file($file) ? filemtime($file) : 0;
+
+        return 'catalog/view/javascript/shippingdata.js' . ($version ? '?v=' . $version : '');
+    }
+    /* END Shipping Data */
+
     public function index($args = null) {
          /* START Shipping Data */
+            $this->language->load('extension/module/shippingdata');
+
             $this->document->addStyle('catalog/view/theme/default/stylesheet/shippingdata.css');
+            $this->document->addStyle('catalog/view/javascript/select2.min.css');
+            $this->document->addScript('catalog/view/javascript/select2.full.min.js');
+            $this->document->addScript($this->getShippingDataScript());
             /* END Shipping Data */
 
         $this->loadLibrary('simple/simplecheckout');
@@ -314,9 +329,39 @@ class ControllerCheckoutSimpleCheckout extends SimpleController {
         if ($this->_templateData['popup']) {
             $links = $this->simplecheckout->getScriptsAndStyles();
 
+            /* START Shipping Data */
+            foreach (array('catalog/view/javascript/select2.full.min.js', $this->getShippingDataScript()) as $script) {
+                if (!in_array($script, $links['scripts'])) {
+                    $links['scripts'][] = $script;
+                }
+            }
+
+            foreach (array('catalog/view/javascript/select2.min.css', 'catalog/view/theme/default/stylesheet/shippingdata.css') as $style) {
+                if (!in_array($style, $links['styles'])) {
+                    $links['styles'][] = $style;
+                }
+            }
+            /* END Shipping Data */
+
             $this->_templateData['simple_styles'] = $links['styles'];
             $this->_templateData['simple_scripts'] = $links['scripts'];
         } 
+
+        /* START Shipping Data */
+        $this->_templateData['np_shipping_url']   = $this->url->link('extension/module/shippingdata/getShippingData');
+        $this->_templateData['np_shipping_texts'] = array(
+            'search_city'        => $this->language->get('text_search_city'),
+            'search_warehouse'   => $this->language->get('text_search_warehouse'),
+            'select_city_first'  => $this->language->get('text_select_city_first'),
+            'no_results'         => $this->language->get('text_no_results'),
+            'searching'          => $this->language->get('text_searching'),
+            'input_too_short'    => $this->language->get('text_input_too_short'),
+            'loading_more'       => $this->language->get('text_loading_more'),
+            'error_loading'      => $this->language->get('text_error_loading'),
+            'clear_selection'    => $this->language->get('text_clear_selection')
+        );
+        /* END Shipping Data */
+
         
         $this->_templateData['text_proceed_payment']    = $this->language->get('text_proceed_payment');
         $this->_templateData['text_payment_form_title'] = $this->language->get('text_payment_form_title');
