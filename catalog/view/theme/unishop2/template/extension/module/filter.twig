@@ -1,0 +1,107 @@
+<div class="filter-default">
+	<div class="heading">{{ heading_title }}</div>
+	<div class="uni-wrapper">
+	{% for filter_group in filter_groups %}
+		<div class="filter-default__group">
+			<div class="filter-default__group-name">
+				{{ filter_group.name }} <sup></sup>
+			</div>
+			<div id="filter-group{{ filter_group.filter_group_id }}">
+				{% for filter in filter_group.filter %}
+					<label class="filter-default__item input">
+						<input type="checkbox" name="filter[]" value="{{ filter.filter_id }}" {{ filter.filter_id in filter_category ? 'checked="checked"' }} />{{ filter.name }}
+					</label>
+				{% endfor %}
+			</div>
+		</div>
+	{% endfor %}
+	<hr />
+	<button type="button" id="button-filter" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i><span>{{ button_filter }}</span></button>
+	</div>
+</div>
+<script>
+$('#button-filter').on('click', () => {
+	filter = [];
+
+	$('input[name^=\'filter\']:checked').each(function(element) {
+		filter.push(this.value);
+	});
+	
+	var url = '{{ action }}&filter=' + filter.join(',');
+	
+	{% if ajax_filter %}
+	
+	let products = $('.products-block'),
+		pagination = $('.pagination'),
+		paginationText = $('.pagination-text');
+	
+	$.ajax({
+		url: url,
+		type: 'get',
+		dataType: 'html',
+		beforeSend: function() {
+			$('html body').append('<div class="full-width-loading"></div>');
+		},
+		complete: function() {
+			uniSelectView.init();
+			
+			if($('.products-block').length)	uniScrollTo('.products-block');
+			
+			$.each($('.product-thumb a'), function() {
+				$(this).attr('target', '_blank');
+			});
+		},
+		success: function(data) {
+			let result = [];
+			
+			result.product = $(data).find('.products-block').html();
+			result.pagination = $(data).find('.pagination').html();
+			result.paginationText = typeof($(data).find('.pagination-text').html()) != 'undefined' ? $(data).find('.pagination-text').html() : '';
+		
+			if(typeof(result.product) == 'undefined') {
+				result.product = '<div class="div-text-empty" style="width:100%;margin:0 10px">{{ text_no_product }}</div>';
+				result.pagination = '';
+			} else if (typeof(result.pagination) == 'undefined') {
+				result.pagination = '';
+			}
+			
+			window.history.pushState('', '', url);
+			
+			if(!pagination.length) paginationText.before('<div class="pagination"></div>');
+		
+			products.html(result.product);
+			pagination.html(result.pagination);
+			paginationText.html(result.paginationText);
+			
+			$('.full-width-loading').remove();
+		}
+	});
+	{% else %}
+		location = url;
+	{% endif %}
+});
+
+	function def_filter() {
+		if($(window).width() < 767 && !$('.filter-default__icon').length) {
+			$('#column-left').after('<i class="filter-default__icon btn-default fas fa-filter"></i>');
+			
+			$('.filter-default__icon').on('click', () => {
+				$('#column-left, .filter-default__icon').toggleClass('show');
+			});
+			
+			$('.filter-default #button-filter, #content').on('click', () => {
+				$('#column-left, .filter-default__icon').removeClass('show');
+			});
+		} else {
+			$('.filter-default__icon').remove();
+		}
+	};
+	
+	def_filter();
+	
+	let wWidth = $(window).width();
+	
+	$(window).resize(function(){
+		if($(this).width != wWidth) def_filter();
+	});
+</script> 

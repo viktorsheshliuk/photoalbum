@@ -1,0 +1,88 @@
+{{ header }}
+<div class="container">
+	<ul class="breadcrumb">
+		{% for key, breadcrumb in breadcrumbs %}
+			{% if key + 1 < breadcrumbs|length %}
+				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+			{% else %}
+				<li>{{ breadcrumb.text }}</li>
+			{% endif %}
+		{% endfor %}
+	</ul>
+	<div class="row">
+		{{ column_left }}
+		{% if column_left and column_right %}
+			{% set class = 'col-sm-4 col-md-4 col-lg-6' %}
+		{% elseif column_left or column_right %}
+			{% set class = 'col-sm-12 col-md-8 col-lg-9' %}
+		{% else %}
+			{% set class = 'col-sm-12' %}
+		{% endif %}
+		<div id="content" class="{{ class }}">
+			{{ content_top }}
+			<h1>{{ heading_title }}</h1>
+			{# {{ text_message }} #}
+			{# text_success #}
+		<style>
+        .section {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+        }
+    </style>
+			<div class="section">
+        <h1>Dziękujemy za wypełnienie formularza!</h1>
+        <p>Dołożymy wszelkich starań, aby pomóc Ci jak najszybciej i zapewnić zadowolenie z naszych usług.</p>
+        <p>Informujemy, że reklamacja zostanie rozpatrzona w terminie podanym poniżej oraz zgodnie z Ustawą z dnia 30 maja 2014 r. o prawach konsumenta.</p>
+    </div>
+    <div class="section">
+        <h2>Procedura zwrotu/wymiany</h2>
+        <ol>
+            <li>
+                <strong>Wypełnienie formularza</strong>
+                <ul>
+                    <li>Po wypełnieniu formularza nasz serwis gwarancyjny rozpatrzy zgłoszenie w ciągu 3 dni roboczych i wyda wstępną decyzję.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Wysłanie towaru przez klienta</strong>
+                <ul>
+                    <li>Po zatwierdzeniu wniosku towar należy wysłać na własny koszt. Szczegóły dotyczące wysyłki otrzymasz od naszego serwisu gwarancyjnego iFamily.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Odbiór towaru</strong>
+                <ul>
+                    <li>Po dostarczeniu towaru do naszego magazynu wyślemy e-mail z potwierdzeniem jego otrzymania.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Diagnostyka</strong>
+                <ul>
+                    <li>Towar zostanie przekazany do serwisu, który przeprowadzi diagnostykę w ciągu 7 dni roboczych. Na podstawie wyników diagnostyki podejmiemy ostateczną decyzję.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Ostateczna decyzja</strong>
+                <ul>
+                    <li>Wymiana towaru: Jeśli zostanie stwierdzona wada, której nie można naprawić.</li>
+                    <li>Zwrot pieniędzy: Jeśli produkt nie nadaje się do naprawy, dokonamy zwrotu środków w ciągu 2 tygodni, zgodnie z polskim prawem. W przypadku uszkodzenia produktu przez użytkownika zastrzegamy sobie prawo do zwrotu środków w kwocie odpowiadającej aktualnemu stanowi produktu.</li>
+                    <li>Zwrot produktu: Jeśli diagnostyka nie wykaże problemów, produkt zostanie zwrócony w oryginalnym stanie.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+			<div class="buttons">
+				<div class="pull-right"><a href="{{ continue }}" class="btn btn-primary">{{ button_continue }}</a></div>
+			</div>
+			{{ content_bottom }}
+		</div>
+		{{ column_right }}
+	</div>
+</div>
+{{ footer }}

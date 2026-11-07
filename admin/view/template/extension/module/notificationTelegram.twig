@@ -1,0 +1,198 @@
+{{ header }}{{ column_left }}
+<div id="content">
+<div class="page-header">
+   <div class="container-fluid">
+      <div class="pull-right">
+         <button type="submit" form="form_push" data-toggle="tooltip" title="{{button_save}}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+         <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel}}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+         {% for breadcrumb in breadcrumbs %}
+         <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+         {% endfor %}
+      </ul>
+   </div>
+</div>
+<div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+   <div class="panel panel-default">
+      <div class="panel-heading">
+         <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }} </h3>
+      </div>
+      <div class="panel-body">
+         <div id="status"></div>
+         <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-push" class="form-horizontal">
+            <div class="form-group">
+               <div class="col-sm-12">
+                  <button type="button" form="form-push" onclick="appText();" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="{{ btn_add }}"><i class="fa fa-plus"></i></button>
+                  <button type="button" id="test" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="{{ btn_test_push }}"><i class="fa fa-comments-o "></i></button>
+               </div>
+            </div>
+            <div class="form-group" id="groubChatID">
+               <div class="col-sm-12">
+                  <div class="input-group">
+                     <span class="input-group-addon" id="basic-addon1">{{ entry_return_BOTTOKEN}}</span>
+                     <input type="text" name="module_notificationTelegram_boot_token" id="module_notificationTelegram_boot_token"  value="{{ module_notificationTelegram_boot_token }}" placeholder="BOT_TOKEN" class="form-control" />
+                     <span class="input-group-btn"><button  class="btn btn-info " type="button"><i class="fa fa-bookmark"></i></button> </span>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group" id="groubChatID">
+               {% for key,val in module_notificationTelegram_chat_ids %}
+               <div class="col-sm-6">
+                  <div class="input-group parent">
+                     <span class="input-group-addon" id="basic-addon1">{{ entry_return_chatID }}</span>
+                     <input type="text" name="module_notificationTelegram_chat_ids[]" class="form-control"  value="{{ val }}" />
+                     <span class="input-group-btn"><button  class="btn btn-danger removed" type="button"><i class="fa fa-trash-o"></i></button></span>
+                  </div>
+               </div>
+               {% endfor %}
+            </div>
+            <div class="form-group">
+               <label class="col-sm-2 control-label" for="input-status">{{ entry_send_order_alert }}</label>
+               <div class="col-sm-1">
+                  <div class="checkbox">
+                     <label> 
+                     <input type="checkbox" name="module_notificationTelegram_order_alert" id="order_alert" {% if module_notificationTelegram_order_alert %} checked {% endif %} class="form-control" />
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-9">
+                  <div class="btn-toolbar" class="btn-group btn-group-justified" role="group" id="buttonKey"></div>
+                  <br>
+                  <label><strong>{{ entry_return_message }}</strong></label>
+                  <textarea rows="10" cols="50" class="form-control" id="module_notificationTelegram_meassage" name="module_notificationTelegram_meassage" rows="3">{% if module_notificationTelegram_meassage == "" %}{{ entry_return_messag_text }}{% endif %}{% if module_notificationTelegram_meassage %}{{ module_notificationTelegram_meassage }}{% endif %}</textarea>
+               </div>
+            </div>
+            <div class="form-group">
+               <label class="col-sm-2 control-label" for="customer_alert">{{  entry_send_new_customer_alert }}</label>
+               <div class="col-sm-1">
+                  <div class="checkbox">
+                     <label> 
+                     <input type="checkbox" name="module_notificationTelegram_customer_alert" id="module_notificationTelegram_customer_alert" {% if module_notificationTelegram_customer_alert %} checked {% endif %}  class="form-control" />
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-9">
+                  <div class="btn-toolbar" id="buttonKeyNewAccount"></div>
+                  <br>
+                  <label for="exampleFormControlTextarea1"><strong>{{ text_new_account_messag }}</strong></label>
+                  <textarea rows="3" cols="50" class="form-control" id="module_notificationTelegram_new_account_meassage" name="module_notificationTelegram_new_account_meassage">{% if module_notificationTelegram_new_account_meassage == "" %} {{ entry_new_account_messag_text }} {% endif %}{% if module_notificationTelegram_new_account_meassage %}{{ module_notificationTelegram_new_account_meassage }}{% endif %}</textarea>
+               </div>
+            </div>
+            <div class="form-group">
+               <label class="col-sm-2 control-label" for="return">{{  entry_return_alert }}</label>
+               <div class="col-sm-10">
+                  <div class="checkbox">
+                     <label> 
+                     <input type="checkbox" name="module_notificationTelegram_return_alert" id="return" {% if module_notificationTelegram_return_alert %} checked {% endif %}  class="form-control" />
+                     </label>
+                  </div>
+               </div>
+            </div>
+            <div class="form-group">
+               <label class="col-sm-2 control-label" for="input-module_hello_world_status">{{ entry_status }}</label>
+               <div class="col-sm-10">
+                  <select name="module_notificationTelegram_status" id="module_notificationTelegram_status" class="form-control">
+                     {% if module_notificationTelegram_status %}
+                     <option value="1" selected>{{ text_enabled }}</option>
+                     <option value="0">{{ text_disabled }}</option>
+                     {% else  %}
+                     <option value="1">{{ text_enabled }}</option>
+                     <option value="0" selected>{{ text_disabled }}</option>
+                     {% endif %}
+                  </select>
+               </div>
+            </div>
+      </div>
+   </div>
+   </form>
+</div>
+<script type="text/javascript">
+   var obj = ["order_id",  "store_name", "customer_id","firstname", "lastname", "email", "telephone",  "payment_firstname", "payment_lastname", "payment_address_1", "payment_address_2",  "payment_city", "payment_zone",  "payment_country",  "payment_address_format",  "payment_method",  "shipping_firstname", "shipping_lastname", "shipping_company", "shipping_address_1", "shipping_address_2", "shipping_postcode", "shipping_city",  "shipping_zone",  "shipping_country",  "shipping_address_format", "shipping_method", "comment", "total", "order_status_id", "order_status",   "currency_value", "date_added", "date_modified","products"];
+   var objNewAccount = ["firstname", "lastname",  "email",  "telephone"];
+   
+   $( document ).ready(function() {
+       $.each( obj, function( key, value ) {
+           $("#buttonKey").append(' <button onclick = "appenTextarea('+key+')" style="margin:2px;" class="btn btn-info btn-sm buttonKey" keys="'+value+'" type="button">'+value+'</button>');
+   
+       });
+       $.each( objNewAccount, function( key, value ) {
+           $("#buttonKeyNewAccount").append('<div role="group" class="btn-group"> <button onclick = "appenTextareaNewAccount('+key+')" class="btn btn-info btn-sm buttonKey" keys="'+value+'" type="button">'+value+'</button></div>');
+       });
+       removActive();
+   });
+   
+   function appenTextarea(key){
+       var $txt = jQuery("#module_notificationTelegram_meassage");
+       var caretPos = $txt[0].selectionStart;
+       var textAreaTxt = $txt.val();
+       var txtToAdd = "{"+obj[key]+"}";
+       $txt.val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
+   }
+   
+   function appenTextareaNewAccount(key){
+       var $txt = jQuery("#module_notificationTelegram_new_account_meassage");
+       var caretPos = $txt[0].selectionStart;
+       var textAreaTxt = $txt.val();
+       var txtToAdd = "{"+objNewAccount[key]+"}";
+       $txt.val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos) );
+   }
+   
+   function appText(){
+       var html ='<div class="col-sm-6"><div class="input-group parent"><span class="input-group-addon" id="basic-addon1">{{ entry_return_chatID }}</span><input type="textarea" name="module_notificationTelegram_chat_ids[]" class="form-control"  value="{{ val }}"/><span class="input-group-btn"><button   class="btn btn-danger removed" type="button"><i class="fa fa-trash-o"></i></button></span></div></div>';
+   
+       $(html).appendTo('#groubChatID');
+   
+       removActive();
+   }
+   
+   function removActive(){
+       $('.removed').on('click',function () {
+           $(this).parent().prevAll('input').remove();
+           $(this).parent().prevAll('div').remove();
+           $(this).parent().prevAll('span').remove();
+           $(this).remove();
+       });
+   }
+   
+   $(document).ready(function(){
+   
+       $('#test').click(function(e){
+   
+           $('.input-group-addon').button('loading');
+   
+           $('input[name^="module_notificationTelegram_chat_ids"]').each(function() {
+   
+               var obj = $(this);
+               var val = obj.val();
+               var testurl = '{{testUrl}}&module_notificationTelegram_boot_token=' + $('#module_notificationTelegram_boot_token').val() + '&module_notificationTelegram_chat_ids='+ val;
+   
+               $.get(testurl, function(e){
+                   $(obj).prevAll('.input-group-addon').button('reset');
+   
+                   if(e.ok == 1)
+                   {
+                       obj.attr('style', "border:#4cb64c 1px solid;");
+   
+                       $("#status").append('<div class="alert alert-success">{{ text_sent_success }} : '+ val +'</div>');
+                   }else{
+                       obj.attr('style', "border:#e3503e 1px solid;");
+                       obj.append('<div class="alert alert-danger">Message couldnt be sent, please check your details ---'+ val +'</div>');
+                   }
+               },"json");
+           });
+       });
+   });
+</script>
+<style>
+   .input-group.parent {
+   padding-top: 15px;
+   }
+</style>
+{{footer}}

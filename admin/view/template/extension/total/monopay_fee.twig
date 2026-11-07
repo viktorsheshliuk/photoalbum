@@ -1,0 +1,95 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<button type="submit" form="form-privat24_fe" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor%}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+		<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-monopay_fee" class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-fee"><span data-toggle="tooltip" title="{{ entry_fee_help }}">{{ entry_fee }}</span></label>
+						<div class="col-sm-10">
+							<input type="text" name="total_monopay_fee_fee" value="{{ total_monopay_fee_fee }}" placeholder="{{ entry_fee }}" id="input-fee" class="form-control" />
+							<div class="checkbox">
+								<label>
+								<input type="checkbox" name="total_monopay_fee_percents" id="total_monopay_fee_percents" value="{{ total_monopay_fee_percents }}" onclick="$(this).attr('checked') ? $('#total_monopay_fee_percents').val('1') : $('#total_monopay_fee_percents').val('0');" {% if total_monopay_fee_percents == 1 %} checked=\"checked\" {% endif %} />{{ text_percents }}
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-tax_class">
+						{{ entry_tax_class }}
+						</label>
+						<div class="col-sm-10">
+							<select name="total_monopay_fee_tax_class_id" id="total_input-tax_class" class="form-control">
+								<option value="0">{{ text_none }}</option>
+								{% for tax_class in tax_classes %}
+									{% if tax_class.tax_class_id == total_monopay_fee_tax_class_id %}
+									<option value="{{ tax_class['tax_class_id'] }}" selected="selected">{{ tax_class.title }}</option>
+									{% else %} 
+									<span data-toggle="tooltip" title="{{ entry_fee_help }}">
+									<option value="{{ tax_class.tax_class_id }}">{{ tax_class.title }}</option>
+									{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="total_input-custom_title">
+						<span data-toggle="tooltip" title="{{ entry_custom_title_help }}">{{ entry_custom_title }}</span>
+						</label>
+						<div class="col-sm-10">
+							<input type="text" name="total_monopay_fee_custom_title" value="{{ total_monopay_fee_custom_title }}" size="60" placeholder="{{ entry_custom_title }}" id="total_input-custom_title" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="total_input-status">
+						{{ entry_status }}
+						</label>
+						<div class="col-sm-10">
+							<select name="total_monopay_fee_status" id="total_input-status" class="form-control">
+								{% if  total_monopay_fee_status %}
+								<option value="1" selected="selected">{{ text_enabled }}</option>
+								<option value="0">{{ text_disabled }}</option>
+								{% else %}
+								<option value="1">{{ text_enabled }}</option>
+								<option value="0" selected="selected">{{ text_disabled }}</option>
+								{% endif %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="total_input-sort_order">
+						{{ entry_sort_order }}
+						</label>
+						<div class="col-sm-10">
+							<input type="text" name="total_monopay_fee_sort_order" value="{{ total_monopay_fee_sort_order }}" placeholder="0" id="total_input-sort_order" class="form-control" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{{ footer }}

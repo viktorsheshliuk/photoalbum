@@ -1,0 +1,981 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right form-inline">
+                <button type="submit" form="form-shipping" name="apply" data-toggle="tooltip" title="{{ button_apply }}"
+                        class="btn btn-success"><i class="fa fa-check"></i></button>
+                <button type="submit" form="form-shipping" data-toggle="tooltip" title="{{ button_save }}"
+                        class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i
+                            class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        {% if error_warning %}
+            <div class="alert alert-danger alert-dismissible"><i
+                        class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ success }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+            </div>
+            <div class="panel-body">
+                <!-- ВКЛАДКИ -->
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab-main" data-toggle="tab">{{ tab_main }}</a></li>
+                    <li><a href="#tab-sender" data-toggle="tab"><i class="fa fa-user"></i> Отправитель</a></li>
+                    {% for customer_group in customer_groups %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ customer_group.name }} <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#tab-group-{{ customer_group.customer_group_id }}-courier" data-toggle="tab">Кур'єр</a></li>
+                                <li><a href="#tab-group-{{ customer_group.customer_group_id }}-department" data-toggle="tab">Відділення</a></li>
+                                <li><a href="#tab-group-{{ customer_group.customer_group_id }}-parcelbox" data-toggle="tab">Почтомат</a></li>
+                            </ul>
+                        </li>
+                    {% endfor %}
+                    <li><a href="#tab-api" data-toggle="tab">{{ tab_api }}</a></li>
+                    <li><a href="#tab-cron" data-toggle="tab">{{ tab_cron }}</a></li>
+                </ul>
+                
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-shipping"
+                      class="form-horizontal">
+                    <div class="tab-content">
+                        
+                        <!-- ЗАГАЛЬНІ НАЛАШТУВАННЯ -->
+                        <div class="tab-pane active form-horizontal" id="tab-main">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }} (Глобальний)</label>
+                                <div class="col-sm-10">
+                                    <select name="shipping_novaposhta_status" id="input-status" class="form-control">
+                                        <option value="0" {{ "0" == shipping_novaposhta_status ? "selected" : "" }}>{{ text_disabled }}</option>
+                                        <option value="1" {{ "1" == shipping_novaposhta_status ? "selected" : "" }}>{{ text_enabled }}</option>
+                                    </select>
+                                    <div class="help-block">Головний перемикач для всього модуля Нова Пошта</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-api-key">{{ entry_api_key }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_api_key"
+                                           value="{{ shipping_novaposhta_api_key }}" placeholder="{{ entry_api_key }}"
+                                           id="input-api-key" class="form-control"/>
+                                    {% if error_api_key %}
+                                        <div class="text-danger">{{ error_api_key }}</div>
+                                    {% endif %}
+                                    <div class="help-block">API ключ для роботи з сервісами Нова Пошта</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"
+                                       for="input-sort-order">{{ entry_sort_order }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_sort_order"
+                                           value="{{ shipping_novaposhta_sort_order }}"
+                                           placeholder="{{ entry_sort_order }}" id="input-sort-order"
+                                           class="form-control"/>
+                                    <div class="help-block">Загальний порядок сортування модуля серед інших доставок</div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i> Налаштуйте параметри кожного методу доставки для кожної групи користувачів в підменю груп.
+                            </div>
+                        </div>
+
+                        <!-- НАСТРОЙКИ ОТПРАВИТЕЛЯ -->
+                        <div class="tab-pane form-horizontal" id="tab-sender">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i> Настройте данные отправителя для создания ТТН
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-sender-name">Имя отправителя</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_sender_name"
+                                           value="{{ shipping_novaposhta_sender_name }}" 
+                                           placeholder="Имя отправителя" id="input-sender-name" class="form-control"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-sender-phone">Телефон отправителя</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_sender_phone"
+                                           value="{{ shipping_novaposhta_sender_phone }}" 
+                                           placeholder="+380XXXXXXXXX" id="input-sender-phone" class="form-control"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Город отправителя</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="sender_city_search" 
+                                           value="{{ shipping_novaposhta_sender_city_name }}" 
+                                           placeholder="Поиск города..." id="sender-city-search" class="form-control"/>
+                                    <input type="hidden" name="shipping_novaposhta_sender_city_ref" 
+                                           value="{{ shipping_novaposhta_sender_city_ref }}" id="sender-city-ref"/>
+                                    <input type="hidden" name="shipping_novaposhta_sender_city_name" 
+                                           value="{{ shipping_novaposhta_sender_city_name }}" id="sender-city-name"/>
+                                    <div id="sender-city-results" class="list-group" style="position: absolute; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Отделение отправителя</label>
+                                <div class="col-sm-10">
+                                    <select name="shipping_novaposhta_sender_warehouse_ref" id="sender-warehouse-select" class="form-control">
+                                        {% if shipping_novaposhta_sender_warehouse_ref %}
+                                            <option value="{{ shipping_novaposhta_sender_warehouse_ref }}" selected>{{ shipping_novaposhta_sender_warehouse_name }}</option>
+                                        {% else %}
+                                            <option value="">Выберите отделение</option>
+                                        {% endif %}
+                                    </select>
+                                    <input type="hidden" name="shipping_novaposhta_sender_warehouse_name" 
+                                           value="{{ shipping_novaposhta_sender_warehouse_name }}" id="sender-warehouse-name"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Ref отправителя</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_sender_counterparty_ref"
+                                        value="{{ shipping_novaposhta_sender_counterparty_ref }}" 
+                                        placeholder="Ref контрагента-отправителя" class="form-control"/>
+                                    <div class="help-block">Ref контрагента-отправителя из API Новой Почты</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Ref контакта отправителя</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_sender_contact_ref"
+                                        value="{{ shipping_novaposhta_sender_contact_ref }}" 
+                                        placeholder="Ref контактного лица отправителя" class="form-control"/>
+                                    <div class="help-block">Ref контактного лица отправителя (если есть)</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Метод оплаты "наложкой"</label>
+                                <div class="col-sm-10">
+                                    {# <input type="text" name="shipping_novaposhta_sender_contact_ref"
+                                        value="{{ shipping_novaposhta_sender_contact_ref }}" 
+                                        placeholder="Ref контактного лица отправителя" class="form-control"/> #}
+                                        <select name="shipping_novaposhta_payment_nalogka_code" id="input-payment-method" class="form-control">
+                                            <option value="">{{ text_select }}</option>
+                                            {% for method in payment_methods %}
+                                                <option value="{{ method.code }}"{% if method.code == shipping_novaposhta_payment_nalogka_code %} selected{% endif %}>
+                                                    {{ method.title }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    <div class="help-block">Укажите метод оплаты наложенным платежом (для подстановки суммы)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ВКЛАДКИ ДЛЯ КОЖНОЇ ГРУПИ І МЕТОДУ -->
+                        {% for customer_group in customer_groups %}
+                            {% set methods = ['courier', 'department', 'parcelbox'] %}
+                            {% set method_names = {
+                                'courier': 'Доставка кур\'єром',
+                                'department': 'Доставка до відділення', 
+                                'parcelbox': 'Доставка в почтомат'
+                            } %}
+                            
+                            {% for method in methods %}
+                            <div class="tab-pane form-horizontal" id="tab-group-{{ customer_group.customer_group_id }}-{{ method }}">
+                                <h4>{{ method_names[method] }} для групи: {{ customer_group.name }}</h4>
+                                
+                                <!-- Статус для методу -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Статус</label>
+                                    <div class="col-sm-10">
+                                        <select name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][status]" class="form-control">
+                                            <option value="0" {% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['status'] == '0' %}selected{% endif %}>{{ text_disabled }}</option>
+                                            <option value="1" {% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['status'] == '1' %}selected{% endif %}>{{ text_enabled }}</option>
+                                        </select>
+                                        <div class="help-block">Увімкнути/вимкнути {{ method_names[method] }} для цієї групи</div>
+                                    </div>
+                                </div>
+
+                                <!-- Назва -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Назва</label>
+                                    <div class="col-sm-10">
+                                        {% for language in languages %}
+                                            <div class="input-group" style="margin-bottom: 5px;">
+                                                <span class="input-group-addon"><img
+                                                        src="language/{{ language.code }}/{{ language.code }}.png"
+                                                        title="{{ language.name }}"/></span>
+                                                <input type="text"
+                                                       name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][title][{{ language.language_id }}]"
+                                                       value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['title'] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['title'][language.language_id] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['title'][language.language_id] }}{% endif %}"
+                                                       placeholder="Назва" class="form-control"/>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Опис -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Опис</label>
+                                    <div class="col-sm-10">
+                                        {% for language in languages %}
+                                            <div class="input-group" style="margin-bottom: 5px;">
+                                                <span class="input-group-addon"><img
+                                                        src="language/{{ language.code }}/{{ language.code }}.png"
+                                                        title="{{ language.name }}"/></span>
+                                                <textarea name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][description][{{ language.language_id }}]"
+                                                          placeholder="Опис" class="form-control" rows="3">{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['description'] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['description'][language.language_id] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['description'][language.language_id] }}{% endif %}</textarea>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Вартість -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Вартість</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][cost]"
+                                               value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['cost'] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['cost'] }}{% endif %}"
+                                               placeholder="Вартість" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <!-- Порядок сортування -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Порядок сортування</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][sort_order]"
+                                               value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['sort_order'] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['sort_order'] }}{% endif %}"
+                                               placeholder="Порядок сортування" class="form-control"/>
+                                        <div class="help-block">Порядок відображення серед інших методів доставки</div>
+                                    </div>
+                                </div>
+
+                                <!-- Податковий клас -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Податковий клас</label>
+                                    <div class="col-sm-10">
+                                        <select name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][tax_class_id]" class="form-control">
+                                            <option value="0">{{ text_none }}</option>
+                                            {% for tax_class in tax_classes %}
+                                                <option value="{{ tax_class.tax_class_id }}" 
+                                                        {% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['tax_class_id'] and tax_class.tax_class_id == shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['tax_class_id'] %}selected{% endif %}>
+                                                    {{ tax_class.title }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Географічна зона -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Географічна зона</label>
+                                    <div class="col-sm-10">
+                                        <select name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][geo_zone_id]" class="form-control">
+                                            <option value="0">{{ text_none }}</option>
+                                            {% for geo_zone in geo_zones %}
+                                                <option value="{{ geo_zone.geo_zone_id }}" 
+                                                        {% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['geo_zone_id'] and geo_zone.geo_zone_id == shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['geo_zone_id'] %}selected{% endif %}>
+                                                    {{ geo_zone.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Мінімальна сума -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Мін. сума замовлення</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][min_sum]"
+                                               value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['min_sum'] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['min_sum'] }}{% endif %}"
+                                               placeholder="Мін. сума" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <!-- Максимальна сума -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Макс. сума замовлення</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][max_sum]"
+                                               value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['max_sum'] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['max_sum'] }}{% endif %}"
+                                               placeholder="Макс. сума" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <!-- Безкоштовна доставка від суми -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Безкоштовна доставка від</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][free_sum]"
+                                               value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['free_sum'] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['free_sum'] }}{% endif %}"
+                                               placeholder="Сума для безкоштовної доставки" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <!-- Текст безкоштовної доставки -->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Текст безкоштовної доставки</label>
+                                    <div class="col-sm-10">
+                                        {% for language in languages %}
+                                            <div class="input-group" style="margin-bottom: 5px;">
+                                                <span class="input-group-addon"><img
+                                                        src="language/{{ language.code }}/{{ language.code }}.png"
+                                                        title="{{ language.name }}"/></span>
+                                                <input type="text"
+                                                       name="shipping_novaposhta_customer_group_settings[{{ customer_group.customer_group_id }}][{{ method }}][free_text][{{ language.language_id }}]"
+                                                       value="{% if shipping_novaposhta_customer_group_settings[customer_group.customer_group_id] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['free_text'] and shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['free_text'][language.language_id] %}{{ shipping_novaposhta_customer_group_settings[customer_group.customer_group_id][method]['free_text'][language.language_id] }}{% endif %}"
+                                                       placeholder="Текст безкоштовної доставки" class="form-control"/>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endfor %}
+
+                        <!-- API ДАНІ -->
+                        <div class="tab-pane form-horizontal" id="tab-api">
+                            <table class="table table-bordered">
+                                <tbody>
+                                <tr>
+                                    <td>{{ text_regions_total }} <span class="label label-default"
+                                                                       id="regions-total">{{ regions_total }}</span></td>
+                                    <td class="text-center" style="width: 10%">
+                                        <button type="button" class="btn btn-success" id="update-regions"><i
+                                                    class="fa fa-refresh"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ text_cities_total }} <span class="label label-default"
+                                                                      id="cities-total">{{ cities_total }}</span></td>
+                                    <td class="text-center" style="width: 10%">
+                                        <button type="button" class="btn btn-success" id="update-cities"><i
+                                                    class="fa fa-refresh"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ text_departments_total }} <span class="label label-default"
+                                                                          id="departments-total">{{ departments_total }}</span>
+                                    </td>
+                                    <td class="text-center" style="width: 10%">
+                                        <button type="button" class="btn btn-success" id="update-departments"><i
+                                                    class="fa fa-refresh"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p>Увага ! Дані оновлюються автоматично при натисканні кнопки оновлення. Оновлення може зайняти деякий час. (Оновлення відділень - до 5 хвилин)</p>
+                        </div>
+
+                         <!-- CRON ДАНІ -->
+                        <div class="tab-pane form-horizontal" id="tab-cron">
+                            <style type="text/css">
+                                .np-multiselect { position: relative; }
+                                .np-multiselect-panel { display: none; position: absolute; z-index: 1050; top: 34px; left: 0; right: 0; background: #fff; border: 1px solid #cccccc; border-radius: 3px; padding: 5px 10px; max-height: 250px; overflow-y: auto; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175); }
+                                .np-multiselect-panel label { display: block; font-weight: normal; margin: 0; padding: 3px 0; cursor: pointer; }
+                                .np-multiselect.open .np-multiselect-panel { display: block; }
+                                .np-multiselect-label { display: inline-block; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+                            </style>
+
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i> {{ text_cron_info }}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">{{ text_cron_url }}</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" value="{{ cron_url|escape }}" id="input-cron-url" class="form-control" readonly/>
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default" id="copy-cron-url" data-toggle="tooltip" title="{{ button_cron_copy }}"><i class="fa fa-copy"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-tracking-enabled">{{ entry_np_tracking_enabled }}</label>
+                                <div class="col-sm-10">
+                                    <select name="shipping_novaposhta_tracking_enabled" id="input-tracking-enabled" class="form-control">
+                                        <option value="0" {{ "0" == shipping_novaposhta_tracking_enabled ? "selected" : "" }}>{{ text_disabled }}</option>
+                                        <option value="1" {{ "1" == shipping_novaposhta_tracking_enabled ? "selected" : "" }}>{{ text_enabled }}</option>
+                                    </select>
+                                    <div class="help-block">{{ help_np_tracking_enabled }}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">{{ entry_np_tracking_statuses }}</label>
+                                <div class="col-sm-10">
+                                    <input type="hidden" name="np_tracking_statuses_present" value="1"/>
+                                    <div id="tracking-statuses"></div>
+                                    <div class="help-block">{{ help_np_tracking_statuses }}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-cron-key">{{ entry_np_cron_key }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="shipping_novaposhta_cron_key" value="{{ shipping_novaposhta_cron_key }}" id="input-cron-key" class="form-control"/>
+                                    <div class="help-block">{{ help_np_cron_key }}</div>
+                                </div>
+                            </div>
+
+                            <hr/>
+
+                            <h4><i class="fa fa-exchange"></i> {{ text_status_mapping }}</h4>
+                            <div class="alert alert-info">{{ help_status_mapping }}</div>
+
+                            <input type="hidden" name="np_status_map_present" value="1"/>
+
+                            <div id="status-map-empty" class="alert alert-warning"{% if shipping_novaposhta_status_map %} style="display: none;"{% endif %}>{{ text_status_map_empty }}</div>
+
+                            <div id="status-map-rows"></div>
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="button" class="btn btn-success" id="add-status-map-row"><i class="fa fa-plus"></i> {{ button_add_mapping }}</button>
+                                    <button type="button" class="btn btn-primary" id="run-tracking"><i class="fa fa-refresh"></i> {{ button_run_tracking }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript"><!--
+        $('.nav[id*=language]').find('a:first').tab('show');
+        
+        // Поиск города отправителя
+        $('#sender-city-search').on('input', function() {
+            var search = $(this).val();
+            
+            if (search.length >= 2) {
+                $.ajax({
+                    url: 'index.php?route=extension/shipping/novaposhta/searchSenderCities&user_token={{ user_token }}&search=' + search,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(json) {
+                        var html = '';
+                        
+                        $.each(json, function(index, city) {
+                            html += '<a href="#" class="list-group-item sender-city-item" data-ref="' + city.ref + '" data-name="' + city.name + '">' + city.name + '</a>';
+                        });
+                        
+                        $('#sender-city-results').html(html).show();
+                    }
+                });
+            } else {
+                $('#sender-city-results').hide();
+            }
+        });
+        
+        // Выбор города отправителя
+        $(document).on('click', '.sender-city-item', function(e) {
+            e.preventDefault();
+            
+            var cityRef = $(this).data('ref');
+            var cityName = $(this).data('name');
+            
+            $('#sender-city-search').val(cityName);
+            $('#sender-city-ref').val(cityRef);
+            $('#sender-city-name').val(cityName);
+            $('#sender-city-results').hide();
+            
+            // Загрузка отделений
+            $.ajax({
+                url: 'index.php?route=extension/shipping/novaposhta/getSenderWarehouses&user_token={{ user_token }}&city_ref=' + cityRef,
+                type: 'GET',
+                dataType: 'json',
+                success: function(json) {
+                    var html = '<option value="">Выберите отделение</option>';
+                    
+                    $.each(json, function(index, warehouse) {
+                        html += '<option value="' + warehouse.ref + '">' + warehouse.name + '</option>';
+                    });
+                    
+                    $('#sender-warehouse-select').html(html);
+                }
+            });
+        });
+        
+        // Выбор отделения отправителя
+        $('#sender-warehouse-select').on('change', function() {
+            var warehouseName = $(this).find('option:selected').text();
+            $('#sender-warehouse-name').val(warehouseName);
+        });
+        
+        // Скрытие списка городов при клике вне
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#sender-city-results').length) {
+                $('#sender-city-results').hide();
+            }
+        });
+        //--></script>
+    <script type="text/javascript"><!--
+    // Поиск города отправителя
+    $('#sender-city-search').on('input', function() {
+        var search = $(this).val();
+        
+        if (search.length >= 2) {
+            $.ajax({
+                url: 'index.php?route=extension/shipping/novaposhta/searchSenderCities&user_token={{ user_token }}&search=' + encodeURIComponent(search),
+                type: 'GET',
+                dataType: 'json',
+                success: function(json) {
+                    var html = '';
+                    
+                    if (json.length > 0) {
+                        $.each(json, function(index, city) {
+                            html += '<a href="#" class="list-group-item sender-city-item" data-ref="' + city.ref + '" data-name="' + city.name + '">' + city.name + '</a>';
+                        });
+                    } else {
+                        html = '<div class="list-group-item">Ничего не найдено</div>';
+                    }
+                    
+                    $('#sender-city-results').html(html).show();
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.error(thrownError);
+                }
+            });
+        } else {
+            $('#sender-city-results').hide();
+        }
+    });
+    
+    // Выбор города отправителя
+    $(document).on('click', '.sender-city-item', function(e) {
+        e.preventDefault();
+        
+        var cityRef = $(this).data('ref');
+        var cityName = $(this).data('name');
+        
+        $('#sender-city-search').val(cityName);
+        $('#sender-city-ref').val(cityRef);
+        $('#sender-city-name').val(cityName);
+        $('#sender-city-results').hide();
+        
+        // Загрузка отделений
+        $.ajax({
+            url: 'index.php?route=extension/shipping/novaposhta/getSenderWarehouses&user_token={{ user_token }}&city_ref=' + encodeURIComponent(cityRef),
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: function() {
+                $('#sender-warehouse-select').html('<option value="">Загрузка...</option>');
+            },
+            success: function(json) {
+                var html = '<option value="">Выберите отделение</option>';
+                
+                if (json.length > 0) {
+                    $.each(json, function(index, warehouse) {
+                        html += '<option value="' + warehouse.ref + '">' + warehouse.name + '</option>';
+                    });
+                }
+                
+                $('#sender-warehouse-select').html(html);
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.error(thrownError);
+                $('#sender-warehouse-select').html('<option value="">Ошибка загрузки</option>');
+            }
+        });
+    });
+    
+    // Выбор отделения отправителя
+    $('#sender-warehouse-select').on('change', function() {
+        var warehouseName = $(this).find('option:selected').text();
+        $('#sender-warehouse-name').val(warehouseName);
+    });
+    
+    // Скрытие списка городов при клике вне
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#sender-city-results').length) {
+            $('#sender-city-results').hide();
+        }
+    });
+    
+    // Обновление отделений
+    $('#update-departments').on('click', function () {
+        const node = this;
+        $.ajax({
+            url: 'index.php?route=extension/shipping/novaposhta/updateDepartments&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            beforeSend: function () {
+                $(node).prop('disabled', true);
+                $(node).find('i').addClass('fa-spin');
+            },
+            success: function (json) {
+                if (json['error']) {
+                    alert('Error: ' + json['error']);
+                } else {
+                    if (json['new_total']) {
+                        $('#departments-total').html(json['new_total']);
+                    }
+                    alert('Отделения обновлены! Всего: ' + json['new_total']);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            },
+            complete: function() {
+                $(node).find('i').removeClass('fa-spin');
+                $(node).prop('disabled', false);
+            }
+        });
+    });
+
+    // Обновление городов
+    $('#update-cities').on('click', function () {
+        const node = this;
+        $.ajax({
+            url: 'index.php?route=extension/shipping/novaposhta/updateCities&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            beforeSend: function () {
+                $(node).prop('disabled', true);
+                $(node).find('i').addClass('fa-spin');
+            },
+            success: function (json) {
+                if (json['error']) {
+                    alert('Error: ' + json['error']);
+                } else {
+                    if (json['new_total']) {
+                        $('#cities-total').html(json['new_total']);
+                    }
+                    alert('Города обновлены! Всего: ' + json['new_total']);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            },
+            complete: function() {
+                $(node).find('i').removeClass('fa-spin');
+                $(node).prop('disabled', false);
+            }
+        });
+    });
+
+    // Обновление регионов
+    $('#update-regions').on('click', function () {
+        const node = this;
+        $.ajax({
+            url: 'index.php?route=extension/shipping/novaposhta/updateRegions&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            beforeSend: function () {
+                $(node).prop('disabled', true);
+                $(node).find('i').addClass('fa-spin');
+            },
+            success: function (json) {
+                if (json['error']) {
+                    alert('Error: ' + json['error']);
+                } else {
+                    if (json['new_total']) {
+                        $('#regions-total').html(json['new_total']);
+                    }
+                    alert('Регионы обновлены! Всего: ' + json['new_total']);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            },
+            complete: function() {
+                $(node).find('i').removeClass('fa-spin');
+                $(node).prop('disabled', false);
+            }
+        });
+    });
+//--></script>
+    
+    <script type="text/javascript"><!--
+    // Статуси Нової Пошти, статуси замовлень та збережена відповідність
+    var npStatuses = {{ novaposhta_statuses|json_encode() }};
+    var npOrderStatuses = {{ order_statuses|json_encode() }};
+    var npTrackingStatuses = {{ shipping_novaposhta_tracking_statuses|json_encode() }};
+    var npStatusMap = {{ shipping_novaposhta_status_map|json_encode() }};
+
+    var npText = {
+        none: '{{ text_np_statuses_none|escape('js') }}',
+        selected: '{{ text_np_statuses_selected|escape('js') }}',
+        selectAll: '{{ text_np_select_all|escape('js') }}',
+        deselectAll: '{{ text_np_deselect_all|escape('js') }}',
+        selectStatus: '{{ text_select_status|escape('js') }}',
+        duplicate: '{{ error_np_status_map_duplicate|escape('js') }}',
+        result: '{{ text_tracking_result|escape('js') }}',
+        copied: '{{ text_cron_copied|escape('js') }}'
+    };
+
+    // Оновлення підпису мультивибору
+    function npUpdateMultiselectLabel($multiselect) {
+        var $checked = $multiselect.find('input[type="checkbox"]:checked');
+        var label = '';
+
+        if (!$checked.length) {
+            label = npText.none;
+        } else {
+            var names = [];
+
+            $checked.slice(0, 2).each(function () {
+                names.push($(this).attr('data-label'));
+            });
+
+            label = npText.selected + ' ' + $checked.length + ': ' + names.join(', ');
+
+            if ($checked.length > 2) {
+                label += ' ...';
+            }
+        }
+
+        $multiselect.find('.np-multiselect-label').text(label);
+    }
+
+    // Побудова мультивибору з чекбоксів
+    function npBuildMultiselect(inputName, items, selected) {
+        var selectedValues = [];
+        var html = '';
+
+        // Значення з налаштувань можуть приходити числами, а value чекбоксу завжди рядок
+        $.each(selected || [], function (index, value) {
+            selectedValues.push(String(value));
+        });
+
+        html += '<div class="np-multiselect">';
+        html += '<button type="button" class="btn btn-default form-control text-left np-multiselect-toggle"><span class="np-multiselect-label"></span><span class="caret pull-right"></span></button>';
+        html += '<div class="np-multiselect-panel">';
+        html += '<a href="#" class="np-multiselect-all">' + npText.selectAll + '</a> | <a href="#" class="np-multiselect-none">' + npText.deselectAll + '</a>';
+        html += '<hr style="margin: 5px 0;"/>';
+
+        $.each(items, function (index, item) {
+            var checked = $.inArray(String(item.value), selectedValues) !== -1 ? ' checked' : '';
+
+            html += '<label><input type="checkbox" name="' + inputName + '" value="' + item.value + '" data-label="' + item.label + '"' + checked + '/> [' + item.value + '] ' + item.label + '</label>';
+        });
+
+        html += '</div></div>';
+
+        return html;
+    }
+    // Статуси замовлень, які потрібно відслідковувати
+    var npTrackingItems = [];
+
+    $.each(npOrderStatuses, function (index, orderStatus) {
+        npTrackingItems.push({
+            value: orderStatus.order_status_id,
+            label: orderStatus.name
+        });
+    });
+
+    $('#tracking-statuses').html(npBuildMultiselect('shipping_novaposhta_tracking_statuses[]', npTrackingItems, npTrackingStatuses));
+
+    $('#tracking-statuses').find('.np-multiselect').each(function () {
+        npUpdateMultiselectLabel($(this));
+    });
+
+    // Статуси Нової Пошти для вибору
+    var npStatusItems = [];
+
+    $.each(npStatuses, function (statusCode, statusName) {
+        npStatusItems.push({
+            value: statusCode,
+            label: statusName
+        });
+    });
+
+    var npStatusMapIndex = 0;
+
+    function npUpdateStatusMapEmpty() {
+        if ($('#status-map-rows .status-map-row').length) {
+            $('#status-map-empty').hide();
+        } else {
+            $('#status-map-empty').show();
+        }
+    }
+
+    function npAddStatusMapRow(row) {
+        var index = npStatusMapIndex++;
+        var selected = row && row['statuses'] ? row['statuses'] : [];
+        var orderStatusId = row && row['order_status_id'] ? String(row['order_status_id']) : '';
+
+        var html = '';
+
+        html += '<div class="form-group status-map-row">';
+        html += '<div class="col-sm-offset-2 col-sm-5" style="margin-bottom: 5px;">';
+        html += npBuildMultiselect('shipping_novaposhta_status_map[' + index + '][statuses][]', npStatusItems, selected);
+        html += '</div>';
+        html += '<div class="col-sm-4" style="margin-bottom: 5px;">';
+        html += '<select name="shipping_novaposhta_status_map[' + index + '][order_status_id]" class="form-control">';
+        html += '<option value="">' + npText.selectStatus + '</option>';
+
+        $.each(npOrderStatuses, function (i, orderStatus) {
+            var selectedAttr = String(orderStatus.order_status_id) === orderStatusId ? ' selected' : '';
+
+            html += '<option value="' + orderStatus.order_status_id + '"' + selectedAttr + '>' + orderStatus.name + '</option>';
+        });
+
+        html += '</select>';
+        html += '</div>';
+        html += '<div class="col-sm-1" style="margin-bottom: 5px;">';
+        html += '<button type="button" class="btn btn-danger remove-status-map-row"><i class="fa fa-minus-circle"></i></button>';
+        html += '</div>';
+        html += '</div>';
+
+        var $row = $(html);
+
+        $('#status-map-rows').append($row);
+
+        $row.find('.np-multiselect').each(function () {
+            npUpdateMultiselectLabel($(this));
+        });
+
+        npUpdateStatusMapEmpty();
+    }
+
+    $.each(npStatusMap, function (index, row) {
+        npAddStatusMapRow(row);
+    });
+
+    npUpdateStatusMapEmpty();
+    // Додати рядок відповідності
+    $('#add-status-map-row').on('click', function () {
+        npAddStatusMapRow(null);
+    });
+
+    // Видалити рядок відповідності
+    $(document).on('click', '.remove-status-map-row', function (e) {
+        e.preventDefault();
+
+        $(this).closest('.status-map-row').remove();
+
+        npUpdateStatusMapEmpty();
+    });
+
+    // Відкрити/закрити список
+    $(document).on('click', '.np-multiselect-toggle', function (e) {
+        e.preventDefault();
+
+        var $multiselect = $(this).closest('.np-multiselect');
+
+        $('.np-multiselect.open').not($multiselect).removeClass('open');
+
+        $multiselect.toggleClass('open');
+    });
+
+    // Закрити список при кліку поза ним
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.np-multiselect').length) {
+            $('.np-multiselect.open').removeClass('open');
+        }
+    });
+
+    $(document).on('change', '.np-multiselect input[type="checkbox"]', function () {
+        npUpdateMultiselectLabel($(this).closest('.np-multiselect'));
+    });
+
+    $(document).on('click', '.np-multiselect-all', function (e) {
+        e.preventDefault();
+
+        $(this).closest('.np-multiselect').find('input[type="checkbox"]').prop('checked', true).trigger('change');
+    });
+
+    $(document).on('click', '.np-multiselect-none', function (e) {
+        e.preventDefault();
+
+        $(this).closest('.np-multiselect').find('input[type="checkbox"]').prop('checked', false).trigger('change');
+    });
+
+    // Перевірка дублів кодів Нової Пошти перед збереженням
+    $('#form-shipping').on('submit', function () {
+        var used = {};
+        var duplicates = [];
+
+        $('#status-map-rows input[type="checkbox"]:checked').each(function () {
+            var code = $(this).val();
+
+            if (used[code]) {
+                duplicates.push(code);
+            } else {
+                used[code] = true;
+            }
+        });
+
+        if (duplicates.length) {
+            alert(npText.duplicate + duplicates.join(', '));
+
+            return false;
+        }
+    });
+
+    // Копіювати URL cron
+    $('#copy-cron-url').on('click', function () {
+        var input = document.getElementById('input-cron-url');
+
+        input.select();
+        input.setSelectionRange(0, 99999);
+
+        try {
+            document.execCommand('copy');
+
+            alert(npText.copied);
+        } catch (error) {
+            alert(input.value);
+        }
+    });
+
+    // Оновити статуси зараз
+    $('#run-tracking').on('click', function () {
+        var node = this;
+
+        $.ajax({
+            url: 'index.php?route=extension/shipping/novaposhta/runTracking&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            beforeSend: function () {
+                $(node).prop('disabled', true);
+                $(node).find('i').addClass('fa-spin');
+            },
+            success: function (json) {
+                if (json['errors'] && json['errors'].length) {
+                    alert(json['errors'].join("\r\n"));
+                }
+
+                if (typeof json['processed'] !== 'undefined') {
+                    alert(npText.result.replace('%s', json['processed']).replace('%s', json['updated']).replace('%s', json['skipped']));
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            },
+            complete: function () {
+                $(node).find('i').removeClass('fa-spin');
+                $(node).prop('disabled', false);
+            }
+        });
+    });
+    //--></script>
+
+</div>
+{{ footer }}

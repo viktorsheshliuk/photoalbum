@@ -1,0 +1,392 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<br />
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+			<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+			</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+						<div class="col-sm-10">
+							<input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+							{% if error_name %}<div class="text-danger">{{ error_name }}</div>{% endif %}
+						</div>
+					</div> 
+					<div class="form-group" id="main-div">
+						<label class="col-sm-2 control-label" for="input-name"></label>
+						<div class="tabs-blocks col-sm-10">
+						
+							<button type="button" class="btn btn-sm btn-primary" onclick="addNewTab();">{{ button_add_tab }}</button>
+							<hr />
+							
+							{% set names = ['latest', 'special', 'bestseller', 'popular', 'featured'] %}
+						
+							<ul class="nav nav-tabs">
+								{% for key, tab in tabs %}
+									<li id="tab-{{ key }}" {{ key not in names ? 'class="additional"' }} ><a href="#{{ key }}" data-toggle="tab">{{ tab.title[lang_id] ? tab.title[lang_id] : 'New tab' }}</a></li>
+								{% endfor %}
+							</ul>
+							<div class="tab-content">
+								{% for key, tab in tabs %}
+									<div id="{{ key }}" class="tab-pane">
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-product">{{ entry_title }}</label>
+											<div class="col-sm-10">
+												<ul class="nav nav-tabs">
+													{% for lang in languages %}
+														<li><a href="#{{ key }}-title-{{ lang.language_id }}" data-toggle="tab"><img src="language/{{ lang.code }}/{{ lang.code }}.png" title="{{ lang.name }}" /></a></li>
+													{% endfor %}
+												</ul>
+												<div class="tab-content">
+													{% for lang in languages %}
+														<div id="{{ key }}-title-{{ lang.language_id }}" class="tab-pane">
+															<input type="text" name="set[{{ key }}][title][{{ lang.language_id }}]" value="{{ tab.title[lang.language_id] ? tab.title[lang.language_id] : 'New tab' }}" class="{{ key not in names ? 'additional_tab_name' }} form-control" />
+														</div>
+													{% endfor %}
+												</div>
+											</div>
+										</div>
+										{% if key not in names or key == 'featured' %}
+											<div class="form-group">
+												<label class="col-sm-2 control-label">{{ entry_product }}</label>
+												<div class="col-sm-10">
+													<input type="text" name="product_name" value="" placeholder="{{ text_autocomplete }}" data-name="{{ key }}" class="tabs-product form-control" />
+													<br />
+													<div class="{{ key }}-product well well-sm" style="height:150px;overflow:auto">
+														{% for product in tab.products_selected %}
+															<div class="tabs-product-item"><i class="fa fa-minus-circle"></i> {{ product.name }}
+																<input type="hidden" name="set[{{ key }}][products][]" value="{{ product.product_id }}" />
+															</div>
+														{% endfor %}
+													</div>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label">{{ entry_category }}</label>
+												<div class="col-sm-10">
+													<input type="text" name="set[{{ key }}][category_name]" value="{{ tab.category_name }}" placeholder="{{ text_autocomplete }}" data-name="{{ key }}" class="tabs-category form-control" />
+													<input type="hidden" name="set[{{ key }}][category_id]" value="{{ tab.category_id }}" />
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label">{{ entry_sort_product }}</label>
+												<div class="col-sm-10">
+													{% set sorts = {
+														0: text_sort_default,
+														'pd.name|ASC': text_sort_name_asc,
+														'pd.name|DESC': text_sort_name_desc,
+														'p.price|ASC': text_sort_price_asc,
+														'p.price|DESC': text_sort_price_desc,
+														'p.date_added|ASC': text_sort_date_asc,
+														'p.date_added|DESC': text_sort_date_desc,
+														'p.viewed|ASC': text_sort_popular_asc,
+														'p.viewed|DESC': text_sort_popular_desc,
+														'rating|ASC': text_sort_review_asc,
+														'rating|DESC': text_sort_review_desc} 
+													%}
+													<select name="set[{{ key }}][products_sort]" class="form-control">
+														{% for key, sort in sorts %}
+															<option value="{{ key }}" {{ key == tab.products_sort ? 'selected="selected"' }}>{{ sort }}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										{% endif %}
+										<div class="form-group">
+											<label class="col-sm-2 control-label">{{ entry_limit }}</label>
+											<div class="col-sm-10">
+												<input type="text" name="set[{{ key }}][limit]" value="{{ tab.limit ? tab.limit : 5 }}" placeholder="{{ entry_limit }}" id="input-limit" class="form-control" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-limit">{{ entry_thumb }}</label>
+											<div class="col-sm-10">
+												<div class="input-group">
+													<input type="text" name="set[{{ key }}][thumb_width]" value="{{ tab.thumb_width ? tab.thumb_width : 220 }}" class="form-control" style="width:50% !important;text-align:center">
+													<input type="text" name="set[{{ key }}][thumb_height]" value="{{ tab.thumb_height ? tab.thumb_height : 230 }}" class="form-control" style="width:50% !important;text-align:center">
+													<span class="input-group-addon">пикс.</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-limit">{{ entry_type }}</label>
+											<div class="col-sm-10">
+												<div style="height:10px"></div>
+												<input type="checkbox" name="set[{{ key }}][type]" value="1" {{ tab.type ? 'checked="checked"' }} />
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-limit">{{ entry_qty }}</label>
+											<div class="col-sm-10">
+												<div style="height:10px"></div>
+												<input type="checkbox" name="set[{{ key }}][quantity]" value="1" {{ tab.quantity ? 'checked="checked"' }} />
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-limit">{{ entry_sort }}</label>
+											<div class="col-sm-10">
+												<input type="text" name="set[{{ key }}][sort_order]" value="{{ tab.sort_order ? tab.sort_order : 1 }}" class="form-control">
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-status">{{ entry_status_tab }}</label>
+											<div class="col-sm-10">
+												<div style="height:10px"></div>
+												<input type="checkbox" name="set[{{ key }}][status]" value="1" {{ tab.status ? 'checked="checked"' }} class="form-control" />
+											</div>
+										</div>
+										{% if key not in names %}
+											<div class="form-group">
+												<label class="col-sm-2 control-label"></label>
+												<div class="col-sm-10">
+													<a class="btn btn-sm btn-danger" onclick="removeTab(this)">{{ button_remove_tab }}</a>
+												</div>
+											</div>
+										{% endif %}									
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+						<div class="col-sm-10">
+							<select name="status" class="form-control">
+								<option value="1" {{ status ? 'selected="selected"' }}>{{ text_enabled }}</option>
+								<option value="0" {{ status == 0 ? 'selected="selected"' }}>{{ text_disabled }}</option>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	.tab-pane .form-group {margin:0 -15px 0 0}
+</style>
+<script>
+	$(function() {
+		$('.nav-tabs').each(function() {
+			$(this).find('li:first a').tab('show');
+		});
+		
+		$('body').on('click', '.tabs-product-item', function() {
+			$(this).remove();
+		});
+	});
+		
+	function addNewTab() {
+		let items = $('.tabs-blocks > ul li.additional').length, key = 'additional-0';
+		
+		if(items) {
+			let d = [];
+			
+			$('.tabs-blocks > ul li.additional').each(function(){
+				d.push(Number($(this).attr('id').replace(/\D+/g,"")));
+			});
+			
+			key = 'additional-'+(Math.max.apply(Math, d)+1);
+		}
+			
+		$('.tabs-blocks > ul').append('<li id="tab-'+key+'" class="additional"><a href="#'+key+'" data-toggle="tab">New tab</a></li>');
+
+		html = '<div id="'+key+'" class="tab-pane">';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label" for="input-product">{{ entry_title }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<ul class="nav nav-tabs">';
+		{% for lang in languages %}
+		html += '<li><a href="#'+key+'-title-{{ lang.language_id }}" data-toggle="tab"><img src="language/{{ lang.code }}/{{ lang.code }}.png" title="{{ lang.name }}" /></a></li>';
+		{% endfor %}
+		html += '</ul>';
+		html += '<div class="tab-content">';
+		{% for lang in languages %}
+		html += '<div id="'+key+'-title-{{ lang.language_id }}" class="tab-pane">';
+		html += '<input type="text" name="set['+key+'][title][{{ lang.language_id }}]" value="" class="additional_tab_name form-control" />';
+		html += '</div>';
+		{% endfor %}
+		html += '</div>';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label">{{ entry_product }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<input type="text" name="product_name" value="" placeholder="" data-name="'+key+'" class="tabs-product form-control" />';
+		html += '<br />';
+		html += '<div class="'+key+'-product well well-sm" style="height:150px;overflow:auto">';
+		html += '</div>';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label">{{ entry_category }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<input type="text" name="set['+key+'][category_name]" value="" placeholder="" data-name="'+key+'" class="tabs-category form-control" />';
+		html += '<input type="hidden" name="set['+key+'][category_id]" value="" />';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label">{{ entry_sort_product }}</label>';
+		html += '<div class="col-sm-10">';
+		{% set sorts = {0: text_sort_default, 'pd.name': text_sort_name, 'p.price': text_sort_price, 'p.date_added': text_sort_date, 'p.viewed': text_sort_popular, 'rating': text_sort_review} %}
+		html += '<select name="set['+key+'][sort]" class="form-control">';
+		{% for key, sort in sorts  %}
+		html += '<option value="{{ key }}" {{ key == tab.sort ? 'selected="selected"' }}>{{ sort }}</option>';
+		{% endfor %}
+		html += '</select>';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label">{{ entry_limit }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<input type="text" name="set['+key+'][limit]" value="5" placeholder="{{ entry_limit }}" id="input-limit" class="form-control" />';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label" for="input-limit">{{ entry_thumb }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<div class="input-group">';
+		html += '<input type="text" name="set['+key+'][thumb_width]" value="220" class="form-control" style="width:50% !important;text-align:center">';
+		html += '<input type="text" name="set['+key+'][thumb_height]" value="200" class="form-control" style="width:50% !important;text-align:center">';
+		html += '<span class="input-group-addon">пикс.</span>';
+		html += '</div>';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label" for="input-limit">{{ entry_type }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<div style="height:10px"></div><input type="checkbox" name="set['+key+'][type]" value="1" />';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label" for="input-limit">{{ entry_qty }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<div style="height:10px"></div><input type="checkbox" name="set['+key+'][quantity]" value="1" />';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label" for="input-limit">{{ entry_sort }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<input type="text" name="set['+key+'][sort_order]" value="1" class="form-control">';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label" for="input-status">{{ entry_status_tab }}</label>';
+		html += '<div class="col-sm-10">';
+		html += '<div style="height:10px"></div><input type="checkbox" name="set['+key+'][status]" value="1" />';
+		html += '</div>';
+		html += '</div>';
+		html += '<div class="form-group">';
+		html += '<label class="col-sm-2 control-label"></label>';
+		html += '<div class="col-sm-10">';
+		html += '<a class="btn btn-sm btn-danger" onclick="removeTab(this)">{{ button_remove_tab }}</a>';
+		html += '</div>';
+		html += '</div>';					
+		html += '</div>';
+		
+		$('.tabs-blocks > .tab-content').append(html);
+		$('.tabs-blocks > ul li:last a, .tabs-blocks #'+key+' ul li:first a').tab('show');
+	}
+		
+	function removeTab(elem) {
+		counter = 0;
+		parent = $(elem).closest('.tab-pane');						
+	
+		$('.tabs-blocks > ul li:eq('+getNumber(parent)+')').remove();
+		parent.remove();
+		$('.tabs-blocks > ul li:first a').tab('show');
+	}
+		
+	function getNumber(element) {
+		if ($(element).prev().length !== 0) {
+			counter++;
+			getNumber($(element).prev());
+		}
+ 
+		return counter;
+	}
+	
+	$('body').on('input', '.tabs-product', function() {
+								
+		const $this = $(this), tab_name = $this.data('name');
+		
+		if($this.next().hasClass('dropdown-menu')) {
+			$this.next().remove();
+		}
+		
+		$this.autocomplete({
+			source: function(request, response) {
+				$.ajax({
+					url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name='+encodeURIComponent(request),
+					dataType: 'json',
+					success: function(json) {
+						response($.map(json, function(item) {
+							return {label: item['name'], value: item['product_id']}
+						}));
+					}
+				});
+			},
+			select: function(item) {
+				$this.val('');
+				$this.parent().find('.'+tab_name+'-product').append('<div class="tabs-product-item"><i class="fa fa-minus-circle"></i> '+item['label']+'<input type="hidden" name="set['+tab_name+'][products][]" value="'+item['value']+'" /></div>');	
+			}
+		});
+	});
+	
+	$('body').on('input', '.tabs-category', function() {
+								
+		const $this = $(this), tab_name = $this.data('name');
+		
+		if($this.next().hasClass('dropdown-menu')) {
+			$this.next().remove();
+		}
+		
+		$this.autocomplete({
+			source: function(request, response) {
+				$.ajax({
+					url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name='+encodeURIComponent(request),
+					dataType: 'json',
+					success: function(json) {
+						response($.map(json, function(item) {
+							return {label: item['name'], value: item['category_id']}
+						}));
+					}
+				});
+			},
+			select: function(item) {
+				$this.val(item['label']);
+				$this.parent().find('input[type="hidden"]').val(item['value']);
+			}
+		});
+	
+		$this.on('input', function() {
+			if($(this).val() == '') {
+				$this.parent().find('input[type="hidden"]').val('');
+			}
+		});
+	});
+</script>
+{{ footer }}

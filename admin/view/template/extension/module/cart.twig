@@ -1,0 +1,70 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <div class="alert alert-info" style="float:left;margin-right:15px;">
+          <i class="fa fa-download"></i> Extension for 
+          <a target="_blank" href="https://ocmod.net/moduli/"> Opencart {{ VERSION }} <i class="fa fa-external-link"></i></a>
+          <br><i class="fa fa-support"></i> Technical support <b>OCMOD.NET</b> in 
+          <a target="_blank" href="https://t.me/OcmodConsultantBot"> Telegram <i class="fa fa-external-link"></i></a>
+        </div>
+        <button type="submit" form="form-account" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+        <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+        {% endfor %} 
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if (error_warning) %} 
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %} 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-account" class="form-horizontal">
+       
+          <table class="table table-bordered">
+
+            <tr>
+              <td>
+                {{ entry_status }}
+              </td>
+              <td>
+                <select name="cart_status" id="input-status" class="form-control">
+                  {% for key,value in select_status %} 
+                    <option value="{{ key }}" {% if (key == cart_status) %} selected='selected' {% endif %} >{{ value }}</option>
+                  {% endfor %} 
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                {{ entry_time }}
+              </td>
+              <td class="form-inline">
+                  <input type="text" class="form-control" value="{{ cart_lifetime }}" name="cart_lifetime">
+                  <select name="cart_unit" id="input-units" class="form-control">
+                    {% for key,value in select_units %} 
+                      <option value="{{ key }}" {% if (key == cart_unit) %} selected='selected' {% endif %} >{{ value }}</option>
+                    {% endfor %} 
+                  </select>
+              </td>
+            </tr>
+
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

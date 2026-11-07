@@ -1,0 +1,62 @@
+{{ header }}
+<div id="account-transaction" class="container">
+	<div class="breadcrumb-h1 {{ menu_expanded ? 'col-md-offset-3 col-lg-offset-3 col-xxl-offset-4' }}">
+		<ul class="breadcrumb mobile">
+			{% for key, breadcrumb in breadcrumbs %}
+				{% if key + 1 < breadcrumbs|length %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% else %}
+					{% if not hide_last_breadcrumb or (hide_last_breadcrumb and key == 1) %}<li>{{ breadcrumb.text }}</li>{% endif %}
+				{% endif %}
+			{% endfor %}
+		</ul>
+		<h1 class="heading">{{ heading_title }}</h1>
+	</div>
+	<div class="row">
+		{{ column_left }}
+		{% if column_left and column_right %}
+			{% set class = 'col-sm-4 col-md-6 col-lg-6 col-xxl-12' %}
+		{% elseif column_left or column_right %}
+			{% set class = 'col-sm-8 col-md-9 col-lg-9 col-xxl-16' %}
+		{% else %}
+			{% set class = 'col-sm-12' %}
+		{% endif %}
+		<div id="content" class="{{ class }}">
+			{{ content_top }}
+			<div class="account-transaction uni-wrapper">
+				{% if transactions %}	
+					{% if column_left and column_right %}
+						{% set class = 'col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xxl-6-1' %}
+					{% elseif column_left or column_right %}
+						{% set class = 'col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xxl-6-1' %}
+					{% else %}
+						{% set class = 'col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xxl-6-1' %}
+					{% endif %}
+					<div class="account-reward__total">{{ text_total }} <b>{{ total }}</b></div>
+					<div class="row row-flex">
+						{% for transaction in transactions %}
+							<div class="{{ class }}">
+							<div class="account-reward__item uni-item-bg">
+								<div class="account-reward__description">
+									<div class="account-reward__description-item date-added"><div class="account-reward__description-div"><span class="account-reward__description-span">{{ column_date_added }}</span></div>{{ transaction.date_added }}</div>
+									<div class="account-reward__description-item amount"><div class="account-reward__description-div"><span class="account-reward__description-span">{{ transaction.description }}</span></div>{{ transaction.amount }}</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					{{ pagination }}
+					<div class="pagination-text">{{ results }}</div>
+				{% else %}
+					<div class="div-text-empty">{{ text_empty }}</div>
+				{% endif %}
+			</div>
+			<div class="buttons clearfix hidden">
+				<div class="pull-right"><a href="{{ continue }}" class="btn btn-primary">{{ button_continue }}</a></div>
+			</div>
+			{{ content_bottom }}
+		</div>
+		{{ column_right }}
+	</div>
+</div>
+{{ footer }}

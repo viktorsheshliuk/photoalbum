@@ -1,0 +1,248 @@
+{{ header }}
+<div id="product-compare" class="container">
+	<div class="breadcrumb-h1 {{ menu_expanded ? 'col-md-offset-3 col-lg-offset-3 col-xxl-offset-4' }}">
+		<ul class="breadcrumb mobile">
+			{% for key, breadcrumb in breadcrumbs %}
+				{% if key + 1 < breadcrumbs|length %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% else %}
+					{% if not hide_last_breadcrumb or (hide_last_breadcrumb and key == 1) %}<li>{{ breadcrumb.text }}</li>{% endif %}
+				{% endif %}
+			{% endfor %}
+		</ul>
+		<h1 class="heading">{{ heading_title }}</h1>
+	</div>
+	{% if success %}
+		<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+			<!-- <button type="button" class="close" data-dismiss="alert">&times;</button> -->
+		</div>
+	{% endif %}
+	<div class="row">
+		{{ column_left }}
+		{% if column_left and column_right %}
+			{% set class = 'col-sm-4 col-md-6 col-lg-6 col-xxl-12' %}
+		{% elseif column_left or column_right %}
+			{% set class = 'col-sm-8 col-md-9 col-lg-9 col-xxl-16' %}
+		{% else %}
+			{% set class = 'col-sm-12' %}
+		{% endif %}
+		<div id="content" class="{{ class }}">
+			{{ content_top }}
+			<div class="uni-wrapper">
+				<div class="compare-page-wrapper">
+					{% if products %}
+						<label class="compare-attribute-hide-same input {{ attribute_groups|length > 0 ? 'is_visible' }}"><input type="checkbox" name="compare-attribute-hide-same" value="1" checked="checked" onclick="hideSame()" />{{ text_compare_attribute_hide_same }}</label>
+						<div class="compare-page {{ products|length > 2 ? 'more' }}" data-products="{{ products|length }}">
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__info compare-page__cell text-center">
+										<div class="compare-page__img">
+											<a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a>
+											<button type="button" class="compare-page__delete" title="{{ button_remove }}" data-href="{{ product.remove }}"><i class="far fa-trash-alt"></i></button>
+											<button type="button" class="compare-page__wishlist wishlist {{ wishlist_btn_disabled ? 'hidden' }}" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><i class="far fa-heart"></i></button>
+										</div>
+										<div class="compare-page__name"><a href="{{ product.href }}">{{ product.name }}</a></div>
+										<div class="compare-page__price">
+											<div class="price">
+												{% if product.special %}
+													<span class="price-old">{{ product.price }}</span> <span class="price-new">{{ product.special }}</span> 
+												{% else %}
+													{{ product.price }}
+												{% endif %}
+											</div>
+											<button type="button" class="compare-page__cart add_to_cart button btn {{ product.cart_btn_class }} {{ product.product_id }}" data-pid="{{ product.product_id }}" title="{{ product.cart_btn_text }}" onclick="cart.add({{ product.product_id }}, this)"><i class="{{ product.cart_btn_icon }}"></i><span>{{ product.cart_btn_text }}</span></button>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__cell">
+										<div class="compare-page__cell-heading">{{ text_model }}</div>
+										{{ product.model }}
+									</div>
+								{% endfor %}
+							</div>
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__cell">
+										<div class="compare-page__cell-heading">{{ text_manufacturer }}</div>
+										{{ product.manufacturer ? product.manufacturer : '-' }}
+									</div>
+								{% endfor %}
+							</div>
+							<!--
+							<tr>
+								<td>{{ text_availability }}</td>
+								{% for product in products %}
+									<td>{{ product.availability }}</td>
+								{% endfor %}
+							</tr>
+							-->
+							{% if review_status %}
+								<div class="compare-page__row">
+									<!-- <div class="compare-page__cell">{{ text_rating }}</div> -->
+									{% for product in products %}
+										<div class="compare-page__cell">
+											<div class="rating">
+												{% for i in 1..5 %}
+													<i class="{{ product.rating < i ? 'far' : 'fa' }} fa-star"></i>
+												{% endfor %} 
+											</div>
+											<div class="compare-page__rating-text">{{ product.reviews }}</div>
+										</div>
+									{% endfor %}
+								</div>
+							{% endif %}
+							<!--
+							<tr>
+								<td>{{ text_summary }}</td>
+								{% for product in products %}
+									<td class="description">{{ product.description }}</td>
+								{% endfor %}
+							</tr>
+							-->
+							{% for attribute_group in attribute_groups %}
+								<div class="compare-page__row compare-page__attr-heading-desktop">
+									{% for product in products %}
+										<div class="compare-page__cell">
+											<strong>{{ attribute_group.name }}</strong>
+										</div>
+									{% endfor %}
+								</div>
+								{% for key, attribute in attribute_group.attribute %}
+									<div class="compare-page__row compare-page__attr">
+										{% for product in products %}
+											<div class="compare-page__cell">
+												<div class="compare-page__cell-heading">{{ attribute.name }}</div>
+												<span class="compare-page__attr-val {{ product.attribute[key] is empty ? 'reset2' }}">{{ product.attribute[key] ? product.attribute[key] : '-' }}
+											</div>
+										{% endfor %}
+									</div>
+								{% endfor %}
+							{% endfor %}
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__cell"><strong>{{ text_dimension }}</strong></div>
+								{% endfor %}
+							</div>
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__cell">
+										{{ product.length > 0 and product.width > 0 and product.height > 0 ? product.length~' x '~product.width~' x '~product.height : '-' }}
+									</div>
+								{% endfor %}
+							</div>
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__cell"><strong>{{ text_weight }}</strong></div>
+								{% endfor %}
+							</div>
+							<div class="compare-page__row">
+								{% for product in products %}
+									<div class="compare-page__cell">
+										{{ product.weight > 0 ? product.weight : '-' }}
+									</div>
+								{% endfor %}
+							</div>
+							{% if attribute_groups|length %}
+								<div class="compare-page__row">
+									{% for product in products %}
+										<div class="compare-page__cell text-center">
+											<button type="button" class="compare-page__cart add_to_cart button btn {{ product.cart_btn_class }} {{ product.product_id }}" data-pid="{{ product.product_id }}" title="{{ product.cart_btn_text }}" onclick="cart.add({{ product.product_id }}, this)"><i class="{{ product.cart_btn_icon }}"></i><span>{{ product.cart_btn_text }}</span></button>
+										</div>
+									{% endfor %}
+								</div>
+							{% endif %}
+						</div>
+					{% else %}
+						<div class="compare-page" style="margin:0" data-products="0">
+							<div class="div-text-empty">{{ text_empty }}</div>
+							<div class="buttons hidden">
+								<div class="pull-right"><a href="{{ continue }}" class="btn btn-default">{{ button_continue }}</a></div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+			<script>
+				$('html body').on('click', '.compare-page__delete', function(e) {
+					e.preventDefault();
+				
+					let url = $(this).data('href');
+					
+					if (document.location.protocol == 'https:') url = url.replace('http:', 'https:');
+				
+					$.get(url, (data) => {
+						const success = $(data).find('.alert-success');
+							
+						if(success.length) {
+							$('.compare-page-wrapper').html($(data).find('.compare-page-wrapper').html());
+							
+							success.each(function() {
+								uniFlyAlert('success', $(this).text());
+							});
+							
+							compare.uniCompareUpd($('.compare-page').data('products'));
+							
+							compareAttr();
+							hideSame();
+						}
+					});
+				});
+				
+				const hideSame = () => {
+					const input_name = 'input[name="compare-attribute-hide-same"]', 
+						  elems = '.compare-page__attr.same',
+						  elems2 = '.compare-page__attr-val';
+
+					if($('.compare-page').data('products') > 1) {
+						if($(input_name).is(':checked')) {
+							$(elems).hide();
+							$(elems2).addClass('reset');
+						} else {
+							$(elems).show();
+							$(elems2).removeClass('reset');
+						}
+					} else {
+						$(input_name).attr('checked', false);
+						$(elems).show();
+					}
+				};
+					
+				const compareAttr = () => {
+					$('.compare-page__attr').each(function() {
+						let $this = $(this), $thisChilds = $this.find('.compare-page__attr-val');
+							
+						$thisChilds.each(function() {
+							let text = String($(this).text()), i = 0;
+								
+							$this.find(':contains("'+text+'")').filter(function() {
+								let result = false;
+									
+								if($(this).text().toLowerCase() == text.toLowerCase()) {
+									i++;
+									result = true;
+								}
+								
+								return result;
+							}).toggleClass('highlight');
+								
+							if($thisChilds.length == i)	{
+								$thisChilds.removeClass('highlight');
+								$this.addClass('same')
+							}
+						});
+					})
+				};
+				
+				compareAttr();
+				hideSame();
+			</script>
+				
+			{{ content_bottom }}
+		</div>
+		{{ column_right }}
+	</div>
+</div>
+{{ footer }} 

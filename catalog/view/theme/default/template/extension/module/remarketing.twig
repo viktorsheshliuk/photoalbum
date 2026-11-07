@@ -1,0 +1,76 @@
+	{% if remarketing_google_json %}
+	<script>
+	if (typeof sendGoogleRemarketing !== 'undefined') {
+		sendGoogleRemarketing({{ remarketing_google_json|json_encode() }});
+	}
+	</script>
+	{% endif %}
+	{% if remarketing_code %}
+	{{ remarketing_code }}
+	{% endif %}
+	{% if ecommerce_status and ga4_datalayer %}
+	<script>
+	{% if ecommerce_status %}
+	window.dataLayer = window.dataLayer || [];
+	dataLayer.push({ ecommerce: null });
+	dataLayer.push({{ ga4_datalayer|json_encode() }});
+	{% if ga4_click_datalayer %}
+	if (localStorage.remarketing_product_id !== 'undefined' && localStorage.remarketing_heading !== 'undefined') {
+		dataLayer.push({ ecommerce: null });
+		click_data = {{ ga4_click_datalayer|json_encode() }};
+		click_data.ecommerce.item_list_name = localStorage.remarketing_heading;
+		dataLayer.push(click_data);
+		delete localStorage.remarketing_product_id;
+		delete localStorage.remarketing_heading;
+	}
+	{% endif %}
+	{% if remarketing_product_json %}
+	dataLayer.push({{ remarketing_product_json|json_encode() }});
+	{% endif %}
+	{% endif %}
+	</script>
+	{% endif %}
+	{% if ecommerce_ga4_status and ga4_product %}
+	<script>
+	if (typeof sendGa4Details !== 'undefined') {
+		sendGa4Details({{ ga4_product|json_encode() }}, {% if measurement_ga4_status %}true{% else %}false{% endif %});
+	} 
+	</script>
+	{% endif %}
+	{% if ga4_json %}
+	<script>
+	window.ecommerce_ga4_products = window.ecommerce_ga4_products || {};
+	ecommerce_ga4_product_data = {{ ga4_json|json_encode() }};
+	if (typeof sendGa4Impressions !== 'undefined') { 
+		sendGa4Impressions(ecommerce_ga4_product_data, {% if view_search_results %}true{% else %}false{% endif %}, {% if measurement_ga4_status %}true{% else %}false{% endif %});
+	}
+	</script>
+	{% endif %}
+	{% if facebook_remarketing_status and facebook_data_json %}
+	<script>
+	if (typeof sendFacebookDetails !== 'undefined') {
+		sendFacebookDetails({{ facebook_data_json|json_encode() }});
+	}
+	  </script>
+	{% endif %}
+	 {% if facebook_remarketing_status and facebook_data_json_category %}
+	<script>
+	if (typeof sendFacebookCategoryDetails !== 'undefined') {
+		sendFacebookCategoryDetails({{ facebook_data_json_category|json_encode() }}, {% if view_search_results %}'true'{% else %}'false'{% endif %});
+	}
+	  </script>  
+	{% endif %}
+	{% if esputnik_remarketing_status and esputnik_data_json %}
+	<script>
+	if (typeof sendEsputnikDetails !== 'undefined') {
+		sendEsputnikDetails({{ esputnik_data_json|json_encode() }});
+	}
+	</script> 
+	{% endif %}
+	{% if esputnik_remarketing_status and esputnik_data_category_json %}
+	<script>
+	if (typeof sendEsputnikCategoryDetails !== 'undefined') {
+		sendEsputnikCategoryDetails({{ esputnik_data_category_json|json_encode() }});
+	}
+	</script>
+	{% endif %}

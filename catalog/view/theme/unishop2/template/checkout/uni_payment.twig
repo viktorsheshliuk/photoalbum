@@ -1,0 +1,26 @@
+<div class="heading">{{ text_payment_methods }}</div>
+<div class="payment-method">	
+	{% if error_warning %}
+		<div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+	{% endif %}
+	{% if payment_methods %}
+		{% for payment_method in payment_methods %}
+			<div class="radio">
+				{% set lock = payment_method.error is empty ? false : true %}
+				<label class="input">
+					{% if payment_method.code == code or not code and lock == false %}
+						{% set code = payment_method.code %}
+						<input type="radio" name="payment_method" value="{{ payment_method.code }}" id="{{ payment_method.code }}" checked="checked" {{ lock == true ? 'disabled' }} />
+					{% else %}
+						<input type="radio" name="payment_method" value="{{ payment_method.code }}" id="{{ payment_method.code }}" {{ lock == true ? 'disabled' }} />
+					{% endif %}
+					<div class="payment-method__title">{{ payment_method.title }}</div>
+					{% if payment_method.terms %}
+						({{ payment_method.terms }})
+					{% endif %}
+				</label>
+				{% if quote.description is not empty %}{{ quote.description }}{% endif %}
+			</div>
+		{% endfor %}
+	{% endif %}
+</div>

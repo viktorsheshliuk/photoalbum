@@ -1,0 +1,29 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-sm-12">
+      <div class="privatiban-success">
+        <h1 class="heading">{{ heading_title }}</h1>
+        {% if order_id %}
+          <h2>{{ text_order_id }} <strong>{{ order_id }}</strong></h2>
+        {% endif %}  
+        <h3 style="color:red">{{ warning }}</h3>
+        <p>{{ text_message }}</p>
+
+        {% if payment_link %}
+          <p>
+            <a href="{{ payment_link }}" target="_blank" class="btn btn-primary">{{ button_pay }}</a>
+          </p>
+        {% endif %}
+
+        {# <p>
+          <a href="{{ continue }}" class="btn btn-secondary">{{ button_continue }}</a>
+        </p> #}
+        {# <div class="buttons">
+          <div class="pull-left"><a href="{{ continue }}" class="btn btn-secondary">{{ button_continue }}</a></div>
+        </div> #}
+      </div>
+    </div>  
+  </div>  
+</div>
+{{ footer }}

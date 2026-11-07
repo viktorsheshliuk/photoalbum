@@ -1,0 +1,33 @@
+.gallery-module__item{position:relative;display:flex;flex-direction:column;padding:0;margin-bottom:20px}
+.gallery-module__image img{border-radius:3px 3px 0 0}
+.gallery-module__image.not-title img{border-radius:3px}
+.gallery-module__name{display:flex;height:100%;align-items:center;justify-content:center;padding:15px;font-weight:500}
+.gallery-module__show-more{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:1em;color:#fff !important;background:rgba(0, 0, 0, .4);border-radius:3px}
+.gallery-module__show-more span{text-decoration:underline}
+.gallery-module__show-more:hover span{text-decoration:none}
+.gallery-module__show-more:after{content:"\2192\A0";padding:0 0 0 10px}
+
+.gallery-description{margin:0 0 25px;padding:15px 15px 5px;background:#f7f7f7;border-radius:4px}
+
+.gallery{margin-bottom:30px}
+.gallery__layout{display:flex}
+.gallery__item{display:flex;flex-direction:column;padding:0;margin-bottom:20px}
+.gallery__image img{border-radius:3px 3px 0 0}
+.gallery__image.not-title img{border-radius:3px}
+.gallery__name{display:flex;height:100%;align-items:center;justify-content:center;text-align:center;padding:15px;font-weight:500}
+a.gallery__name{text-decoration:underline}
+span.gallery__name{color:#888}
+
+.gallery__show-more{width:100%;margin:0 0 40px;text-align:center}
+
+.mfp-bg.mfp-ready{opacity:.6 !important}
+.mfp-bg.mfp-removing{opacity:0 !important}
+.mfp-wrap{z-index:1066}
+.mfp-ready .mfp-arrow{opacity:.5 !important}
+.mfp-removing .mfp-arrow{opacity:0 !important}
+.mfp-figure{background:#fff;border-radius:10px;box-shadow:0 0 20px #555}
+.mfp-figure:after{display:none !important}
+.mfp-close{color:#555 !important;right:10px !important}
+.mfp-bottom-bar{position:relative !important;display:flex;align-items:center;justify-content:space-between;padding:15px}
+.mfp-bottom-bar .mfp-title{max-width:85%;padding:0 !important;font-size:.9em;color:#888}
+.mfp-bottom-bar .mfp-counter{position:relative;color:#555}

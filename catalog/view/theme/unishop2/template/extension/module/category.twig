@@ -1,0 +1,35 @@
+{% if categories %}
+	<nav id="category-module" class="menu-module">
+		<ul class="menu-module__ul">
+			{% for category in categories %}
+				<li class="menu-module__li">
+					<a href="{{ category.href }}" class="menu-module__a {{ category.category_id == category_id ? 'active' }}">
+						{{ category.name }}
+						{% if category.children %}
+							<span class="menu-module__pm {{ category.category_id == category_id ? 'open' }}">
+								<i class="fas fa-minus"></i>
+								<i class="fas fa-plus"></i>
+							</span>
+						{% endif %}
+					</a> 
+					{% if category.children %}
+						<div class="menu-module__children collapse {{ category.category_id == category_id ? 'in' }}">
+							{% for child in category.children %}
+								<a href="{{ child.href }}" class="menu-module__children-a {{ child.category_id == child_id ? 'active' }}">{{ child.name }}</a> 
+							{% endfor %}
+						</div>
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</nav>
+	<script>
+		$(function() {
+			$('#category-module span').on('click', function(e){
+				e.preventDefault();
+				$(this).toggleClass('open');
+				$(this).parent().next().collapse('toggle');
+			});
+		});
+	</script>
+{% endif %}

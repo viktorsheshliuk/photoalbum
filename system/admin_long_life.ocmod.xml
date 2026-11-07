@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<name>Admin Long Life - oc 3</name>
+	<code>Admin Long Life - oc 3</code>
+	<version>oc 3</version>
+	<author>SlaSoft</author>
+    <file path="admin/view/template/common/footer.twig">
+        <operation>
+            <search><![CDATA[</body>]]></search>
+            <add position="before"><![CDATA[
+				{% if (longlife) %} 
+				<script type="text/javascript">
+				window.setInterval(function(){ $.get('{{ longlife }}')}, 60000);
+				</script>
+				{% endif %}
+            ]]></add>
+        </operation>
+    </file>
+    <file path="admin/controller/common/dashboard.php">
+        <operation>
+            <search><![CDATA[public function index() {]]></search>
+            <add position="before"><![CDATA[
+				public function longlife() {
+					$json = array();
+					if (isset($this->session->data['user_token'])) {
+						$json['ok'] = 1;
+					}
+					$this->response->addHeader('Content-Type: application/json');
+					$this->response->setOutput(json_encode($json));		
+				}
+            ]]></add>
+        </operation>
+	</file>
+    <file path="admin/controller/common/footer.php">
+        <operation>
+            <search><![CDATA[return $this->load->view]]></search>
+            <add position="before"><![CDATA[
+				if (isset($this->session->data['user_token'])) {
+					$data['longlife'] = str_replace('&amp;','&',$this->url->link('common/dashboard/longlife','user_token='. $this->session->data['user_token'], 'SSL'));
+				} else {
+					$data['longlife'] = false;
+				}
+            ]]></add>
+        </operation>
+    </file>
+</modification>

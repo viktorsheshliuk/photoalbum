@@ -1,0 +1,49 @@
+{
+    "name": "aunhurian/nova-poshta-sdk",
+    "description": "PHP SDK для інтеграції з API Нової Пошти",
+    "keywords": ["nova poshta", "sdk", "api", "новапошта", "нова пошта", "api клієнт"],
+    "homepage": "https://github.com/aunhurian/nova-poshta-sdk",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "AUnhurian"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "guzzlehttp/guzzle": "^7.8.1"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.6.12",
+        "phpunit/phpunit": "^9.6.22",
+        "phpstan/phpstan": "^1.10",
+        "friendsofphp/php-cs-fixer": "^3.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "AUnhurian\\NovaPoshta\\SDK\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "php vendor/bin/phpunit",
+        "phpstan": "phpstan analyse",
+        "cs-check": "php-cs-fixer check --verbose",
+        "cs-fix": "php-cs-fixer fix --verbose"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

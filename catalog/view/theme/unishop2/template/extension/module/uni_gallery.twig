@@ -1,0 +1,41 @@
+{% if images %}
+	<div class="heading">{{ heading_title }}</div>
+	<div class="uni-module gallery-module gallery-{{ module }}">
+		<div class="uni-module__wrapper row-flex">
+			{% for key, image in images %}
+				<div class="gallery-module__item uni-item">
+					<div class="gallery-module__image {{ image.title is empty  ? 'not-title' }}">
+						<a href="{{ image.popup }}" title="{{ image.title }}" class="img_popup">
+							<img src="{{ image.image }}" alt="{{ image.title }}" title="{{ image.title }}" loading="lazy" class="img-responsive" />
+						</a>
+					</div>
+					{% if image.title %}
+						{% if image.link %}
+							<a href="{{ image.link }}" class="gallery-module__name">{{ image.title }}</a>
+						{% else %}
+							<span class="gallery-module__name">{{ image.title }}</span>
+						{% endif %}
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	{% if show_more %}
+		<div class="gallery__show-more">
+			<a href="{{ gallery_href }}" class="btn btn-lg btn-primary"><span>{{ text_show_more }}</span></a>
+		</div>
+	{% endif %}
+	<script>
+		$('.gallery-{{ module }}').uniModules({
+			type:'{{ type_view is defined ? type_view : 'carousel' }}'
+		});
+		
+		$('.gallery-{{ module }}').magnificPopup({
+			type:'image',
+			delegate: 'a.img_popup',
+			gallery: {
+				enabled:true
+			}
+		});
+	</script>
+{% endif %}

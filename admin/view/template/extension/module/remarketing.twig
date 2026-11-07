@@ -1,0 +1,1892 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right"> 
+        <button type="submit" form="form-remarketing" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if max_input_vars_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ max_input_vars_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if jetcache_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ jetcache_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if seopro_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ seopro_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if theme_editor_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ theme_editor_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-remarketing" class="form-horizontal">
+		  <div class="col-md-2">
+		  <ul class="nav nav-pills nav-stacked">
+		    <li class="active"><a href="#tab-diagnostics" data-toggle="tab" class="diag"><i class="fa fa-gears"></i> {{ text_diagnostics }} <i class="fa fa-flash"></i></a></li>
+            <li><a href="#tab-ecommerce-ga4" data-toggle="tab" {% if remarketing_ecommerce_status or remarketing_ecommerce_ga4_status or remarketing_ecommerce_ga4_measurement_status %}class="enabled"{% endif %}><i class="fa fa-money"></i> {{ text_ecommerce_ga4 }}</a></li>
+			<li><a href="#tab-google" data-toggle="tab" {% if remarketing_google_status %}class="enabled"{% endif %}><i class="fa fa-google"></i> {{ text_google_remarketing }}</a></li>
+			<li><a href="#tab-google-reviews" data-toggle="tab" {% if remarketing_reviews_status %}class="enabled"{% endif %}><i class="fa fa-google"></i> {{ text_google_reviews }}</a></li>
+            <li><a href="#tab-facebook" data-toggle="tab" {% if remarketing_facebook_status %}class="enabled"{% endif %}><i class="fa fa-facebook"></i> {{ text_facebook_remarketing }}</a></li>
+			<li><a href="#tab-feed" data-toggle="tab" {% if remarketing_feed_status %} class="enabled"{% endif %}><i class="fa fa-compress"></i> {{ text_feed }}</a></li>
+			<li><a href="#tab-esputnik" data-toggle="tab" {% if remarketing_esputnik_status %} class="enabled"{% endif %}><i class="fa fa-check"></i> {{ text_esputnik }}</a></li>
+			<li><a href="#tab-tiktok" data-toggle="tab" {% if remarketing_tiktok_status %} class="enabled"{% endif %}><i class="fa fa-check"></i> {{ text_tiktok }}</a></li>
+			<li><a href="#tab-snapchat" data-toggle="tab" {% if remarketing_snapchat_status %} class="enabled"{% endif %}><i class="fa fa-check"></i> {{ text_snapchat }} Beta</a></li>
+			<li><a href="#tab-uet" data-toggle="tab" {% if remarketing_uet_status %} class="enabled"{% endif %}><i class="fa fa-check"></i> {{ text_uet }} Beta</a></li>
+			<li><a href="#tab-telegram" data-toggle="tab" {% if remarketing_telegram_status %} class="enabled"{% endif %}><i class="fa fa-check"></i> {{ text_telegram }}</a></li>
+            <li><a href="#tab-events" data-toggle="tab"><i class="fa fa-bullhorn"></i> {{ text_events }}</a></li>
+            <li><a href="#tab-counters" data-toggle="tab"><i class="fa fa-tachometer"></i> {{ text_counters }}</a></li>
+			<li><a href="{{ remarketing_report_link }}" target="_blank"><i class="fa fa-rocket"></i> {{ text_reports }}</a></li>
+            <li><a href="#tab-help" data-toggle="tab"><i class="fa fa-life-ring"></i> {{ text_help }}</a></li>
+          </ul>
+		  </div>
+		  <div class="col-md-10">
+		  <div class="tab-content">
+		   <div class="tab-pane active" id="tab-diagnostics">
+		   <legend>{{ text_version }}: <span class="version">{{ version }}</span><span class="version-update"></span></legend>
+		   <legend>{{ text_check_install }}</legend>
+		   <div>
+		   <div class="col-sm-12">{{ check_install }}</div>
+		   </div>
+		   <legend>{{ text_forum_documentation }}</legend>
+		   <div class="help-link"><a href="https://remarketing.freelancer.od.ua/" target="_blank">{{ text_help_link }}</a></div>
+		   <div class="help-link"><a href="https://opencartforum.com/files/file/7492-sp-seo-remarketing-all-in-one-pro-23x-3x-google-analytics-4-dinamicheskiy-remarketing-google-ads-facebook-conversions-api-tiktok-marketing-api-fid-dlya-google-merchant-facebook-catalog-tiktok-google-otzyvy-esputnik/?tab=tutorials" target="_blank">{{ text_help_link }} Opencartforum</a></div>
+		    {% if not remarketing_google_status and not remarketing_ecommerce_ga4_status and not remarketing_facebook_status %} 
+		  <legend>Quickstart</legend>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">Google GA4 ID</label>
+                <div class="col-sm-10">
+                   <input type="text" name="ga4_id" value="" id="ga4_id" class="form-control"/>
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">GTM ID</label>
+                <div class="col-sm-10">
+                   <input type="text" name="gtm_id" value="" id="gtm_id" class="form-control"/>
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">Adwords ID</label>
+                <div class="col-sm-10">
+                   <input type="text" name="ads_id" value="" id="ads_id" class="form-control"/>
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">Facebook Pixel ID</label>
+                <div class="col-sm-10">
+                   <input type="text" name="facebook_id" value="" id="facebook_id" class="form-control"/>
+                </div>
+		  </div>
+		  <a class="btn btn-primary magic-button">Magic</a>
+		  <script>
+		  $('.magic-button').on('click', function() {
+		      $('[name="remarketing_status"]').prop('checked', true);
+			  fb_id = $('#facebook_id').val();
+			  gtag_text = '';
+		      if (fb_id != '') {
+				  $('[name="remarketing_facebook_status"], [name="remarketing_facebook_script_status"], [name="remarketing_facebook_pixel_status"], [name="remarketing_facebook_lead"]').prop('checked', true);
+				  $('[name="remarketing_facebook_currency"]').val('UAH').trigger('change');
+				  $('[name="remarketing_facebook_identifier"]').val(fb_id);
+			  }
+			  ga4_id = $('#ga4_id').val();
+		      if (ga4_id != '') {
+				  $('[name="remarketing_ecommerce_ga4_status"]').prop('checked', true);
+				  $('[name="remarketing_ecommerce_currency"]').val('UAH').trigger('change');
+				  $('[name="remarketing_ecommerce_ga4_identifier"]').val(ga4_id);
+			  }
+			  ads_id = $('#ads_id').val();
+		      if (ads_id != '') {
+				  $('[name="remarketing_google_status"]').prop('checked', true);
+				  $('[name="remarketing_google_currency"]').val('UAH').trigger('change');
+				  $('[name="remarketing_google_identifier"]').val(ads_id);
+			  }
+			  gtm_id = $('#gtm_id').val();
+		      if (gtm_id != '') {
+				   var gtm_head_tag = "\n&lt;!-- Google Tag Manager --&gt;&lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','" + gtm_id + "');&lt;/script&gt;&lt;!-- End Google Tag Manager --&gt;";
+				   var gtm_body_tag = "\n&lt;!-- Google Tag Manager (noscript) --&gt;&lt;noscript&gt;&lt;iframe src='https://www.googletagmanager.com/ns.html?id=" + gtm_id + "' height='0' width='0' style='display:none;visibility:hidden'&gt;&lt;/iframe&gt;&lt;/noscript&gt;&lt;!-- End Google Tag Manager (noscript) --&gt;\n";
+				   $('[name="remarketing_counter1"]').append(gtm_head_tag); 
+				   $('[name="remarketing_counter2"]').append(gtm_body_tag); 
+			  }
+			  if (ga4_id != '' || ads_id != '') {
+				  if (ga4_id != '') {
+				      gtag_id = ga4_id;
+				  }
+				  if (ads_id != '' && ga4_id == '') {
+				      gtag_id = ads_id;
+				  }
+				  gtag_text += "\n&lt;!-- Google tag (gtag.js) --&gt;&lt;script async src='https://www.googletagmanager.com/gtag/js?id=" + gtag_id + "'&gt;&lt;/script&gt;&lt;script&gt;window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '" + gtag_id + "');";
+				  if (ga4_id != '' && ads_id != '') {
+				     gtag_text += "gtag('config', '" + ads_id + "');";
+				  }
+				   gtag_text += "&lt;/script&gt;"; 
+				   $('[name="remarketing_counter1"]').append(gtag_text);
+			  }			  
+			  $(this).text('Wait for magic :)'); 
+			  setTimeout(function() {
+				  $('[form="form-remarketing"]').trigger('click');
+			  }, 3000);
+		  });
+		  </script>
+		  <br><br>
+		  {% endif %}
+
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+				<label class="switch">
+					<input type="checkbox" name="remarketing_status" {% if remarketing_status %}checked{% endif %} > 
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_bot_status }}</label>
+            <div class="col-sm-10">
+				<label class="switch">
+					<input type="checkbox" name="remarketing_bot_status" {% if remarketing_bot_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_admin_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_admin_status" {% if remarketing_admin_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group"> 
+            <label class="col-sm-2 control-label">{{ entry_debug_mode }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_debug_mode" {% if remarketing_debug_mode %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_autoclear_mode }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_autoclear_mode" {% if remarketing_autoclear_mode %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_show_in_order }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_show_in_order" {% if remarketing_show_in_order %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_no_shipping }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_no_shipping" {% if remarketing_no_shipping %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		   <div>
+		   </div>
+		  </div>		  
+		  <div class="tab-pane" id="tab-google">
+          <legend>{{ text_google_remarketing }}</legend>
+		  <div class="help-link"><a href="https://support.google.com/google-ads/answer/7305793?hl=ru" target="_blank">{{ text_help_link }} Google</a></div>
+		  <div class="help-link"><a href="https://opencartforum.com/files/tutorials/532-instrukciya-po-nastroyke-remarketinga-google/" target="_blank">{{ text_help_link }} Opencartforum</a></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_google_status" {% if remarketing_google_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+		  <label class="col-sm-2 control-label">{{ entry_currency }} - Google ADS</label>
+				<div class="col-sm-10">
+			<select name="remarketing_google_currency" class="form-control">
+				{% for currency in currencies %}
+				{% if currency.code  ==  remarketing_google_currency %}
+				<option value="{{ currency.code }}" selected="selected">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% else %}
+				<option value="{{ currency.code }}">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% endif %} 
+				{% endfor %}
+			</select>
+		 </div>
+		 </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_google_identifier }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_google_identifier" value="{{ remarketing_google_identifier }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_google_ads_identifier }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_google_ads_identifier" value="{{ remarketing_google_ads_identifier }}" class="form-control" />
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_google_ads_identifier_cart }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_google_ads_identifier_cart" value="{{ remarketing_google_ads_identifier_cart }}" class="form-control" />
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_google_ads_identifier_cart_page }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_google_ads_identifier_cart_page" value="{{ remarketing_google_ads_identifier_cart_page }}" class="form-control" />
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_google_ads_ratio }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_google_ads_ratio" value="{{ remarketing_google_ads_ratio }}" class="form-control" />
+               </div>
+			</div>
+		    <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+            <div class="col-sm-10">
+              <select name="remarketing_google_id" class="form-control">
+                {% if remarketing_google_id  ==  'id' %}
+                <option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_google_id  ==  'model'  %}
+                <option value="id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                 {% else %}
+				<option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div> 
+		  </div>
+		  <div class="tab-pane" id="tab-facebook">
+		  <div class="">
+          </div> 
+          <legend>{{ text_facebook_remarketing }}</legend>
+		  <div class="help-link"><a href="https://developers.facebook.com/docs/facebook-pixel/reference" target="_blank">{{ text_help_link }} Facebook</a></div>
+		  <div class="help-link"><a href="https://opencartforum.com/files/tutorials/534-instrukciya-po-nastroyke-remarketinga-facebook/ target="_blank">{{ text_help_link }} Opencartforum</a></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_facebook_status" {% if remarketing_facebook_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+		  <label class="col-sm-2 control-label">{{ entry_currency }} - Facebook (Meta)</label>
+				<div class="col-sm-10">
+			<select name="remarketing_facebook_currency" class="form-control">
+				{% for currency in currencies %}
+				{% if currency.code  ==  remarketing_facebook_currency %}
+				<option value="{{ currency.code }}" selected="selected">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% else %}
+				<option value="{{ currency.code }}">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% endif %} 
+				{% endfor %}
+			</select>
+		 </div>
+		 </div>		  
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_identifier }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_facebook_identifier" value="{{ remarketing_facebook_identifier }}" class="form-control" />
+                </div>
+		  </div>
+		   <div class="form-group">
+           <label class="col-sm-2 control-label">{{ entry_facebook_ratio }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_facebook_ratio" value="{{ remarketing_facebook_ratio }}" class="form-control" />
+               </div>
+		   </div>
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+            <div class="col-sm-10">
+              <select name="remarketing_facebook_id" class="form-control">
+                {% if remarketing_facebook_id  ==  'id' %}
+                <option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_facebook_id  ==  'model'  %}
+                <option value="id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                {% else %}
+				<option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div>
+		   <legend>{{ text_facebook_pixel }}</legend>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_script_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_facebook_script_status" {% if remarketing_facebook_script_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_pixel_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_facebook_pixel_status" {% if remarketing_facebook_pixel_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_lead }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_facebook_lead" {% if remarketing_facebook_lead %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_depth }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_facebook_depth" {% if remarketing_facebook_depth %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_depth_params }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_facebook_depth_params" value="{{ remarketing_facebook_depth_params }}" class="form-control" />
+                </div>
+			</div>
+			<legend>{{ text_facebook_api }}</legend>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_server_side }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_facebook_server_side" {% if remarketing_facebook_server_side %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_token }}</label>
+            <div class="col-sm-10">
+               <input type="text" name="remarketing_facebook_token" value="{{ remarketing_facebook_token }}" class="form-control" />
+            </div>
+		  </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_api_ver }}</label>
+            <div class="col-sm-10">
+               <input type="text" name="remarketing_facebook_api_ver" value="{{ remarketing_facebook_api_ver }}" class="form-control" />
+            </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_facebook_test_code }}</label>
+            <div class="col-sm-10">
+               <input type="text" name="remarketing_facebook_test_code" value="{{ remarketing_facebook_test_code }}" class="form-control" />
+			   	<br><a class="btn btn-primary test-facebook">{{ button_test_facebook }}</a>
+				<div class="facebook_result"></div>
+				<script>
+				$('.test-facebook').on('click', function(){
+					$.ajax({ 
+						type: 'post',
+						url:  '{{ test_facebook }}',
+						data: {},
+						dataType: 'json',
+						success: function(json) { 
+							if (typeof json.events_received !== "undefined" && json.events_received == 1) {
+								$('.facebook_result').html('<br><div style="background: green;width: auto;display: inline-block;color: #fff;padding: 10px;font-weight: bold;">TEST OK!</div>');
+							} else if (json.error !== "undefined") {
+								$('.facebook_result').html('<br><div style="background: red;width: auto;display: inline-block;color: #fff;padding: 10px;font-weight: bold;">TEST FAILED! ' + json.error.message + '</div>');
+							}
+							console.log(json);
+						}
+					});
+				})
+				</script>
+            </div>
+		  </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_facebook_send_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_facebook_send_status %}
+                        <input type="checkbox" name="remarketing_facebook_send_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_facebook_send_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_facebook_lead_send_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_facebook_lead_send_status %}
+                        <input type="checkbox" name="remarketing_facebook_lead_send_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_facebook_lead_send_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+              </div>
+			  <div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_resend_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="remarketing_facebook_resend_status" class="form-control">
+					  <option value="0">{{ text_not_selected }}</option>
+                      {% for order_status in order_statuses %}
+                      {% if order_status.order_status_id == remarketing_facebook_resend_status %}
+                      <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                      {% else %}
+                      <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                      {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+			<div class="form-group form-facebook-transaction">
+            <label class="col-sm-2 control-label">{{ entry_manual_send }}</label>
+               <div class="col-sm-10">
+               <label class="col-sm-2 control-label">Total</label>
+               <div class="col-sm-10"><input type="text" name="manual_facebook_total" value="" class="form-control" /></div>
+			   <label class="col-sm-2 control-label">Products</label><div class="select-product col-sm-10"><input type="text" name="manual_facebook_product" value="" placeholder="Select product" class="form-control" /></div>
+			   <label class="col-sm-2 control-label"> </label><div class="facebook-products col-sm-10">
+			   <div class="col-sm-12 manual-product"><span class="form-control">ID</span><span class="form-control">Name</span><span class="form-control">Price</span><span class="form-control">Quantity</span></div><br>
+			   </div>
+			   <br><br><a class="btn btn-primary send-facebook-transaction"><i class="fa fa-plus"></i> Send Transaction</a>
+				<div class="send-facebook-result"></div>
+			   </div>
+            </div> 
+<script>
+	manual_facebook_product_id = 0;
+	$('input[name=\'manual_facebook_product\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						name: item['name'],
+						label: item['name'],
+						product_id: item['product_id'],
+						value: item['product_id'],
+						price: item['price']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'manual_facebook_product\']').val('');
+
+		$('.facebook-products').append('<div class="col-sm-12 manual-facebook-product'+manual_facebook_product_id+'"><input type="text" name="manual_facebook_products[' + manual_facebook_product_id + '][product_id]" value="' + item['product_id'] + '" class="form-control col-sm-3" /><input type="text" name="manual_facebook_products[' + manual_facebook_product_id + '][name]" value="' + item['name'] + '" class="form-control col-sm-3" /><input type="text" name="manual_facebook_products[' + manual_facebook_product_id + '][price]" value="' + item['price'] + '" class="form-control col-sm-3" /><input type="text" name="manual_facebook_products[' + manual_facebook_product_id + '][quantity]" value="1" class="form-control col-sm-3" /> <i class="fa fa-trash-o" onclick="$(\'.manual-facebook-product' + manual_facebook_product_id + '\').remove();"></i></div>');
+		manual_facebook_product_id++;
+	}
+});
+	
+	$('.send-facebook-transaction').on('click', function(){
+	send_data = $('.form-facebook-transaction input[type=\'text\']');
+	$.ajax({
+		url: '/index.php?route=common/remarketing/sendFacebookManual',
+		type: 'post',
+		data: send_data,
+		dataType: 'json',
+		beforeSend: function() {
+		},
+		complete: function() {
+		},
+		success: function(json) {
+			if (json['error']) {
+				$('.send-facebook-result').html(json['error']);
+			}
+			if (json['success']) {
+				$('.send-facebook-result').html(json['success']);
+			}
+		},
+        error: function(xhr, ajaxOptions, thrownError) {
+        }
+	});
+});
+</script>
+<style>
+.facebook-products .form-control {
+	width: 200px; display:inline-block;
+}
+</style>
+		  </div>
+		   <div class="tab-pane" id="tab-tiktok">
+          <legend>{{ text_tiktok }}</legend>
+	   	  <div class="help-link"><a href="https://ads.tiktok.com/help/article?aid=10028" target="_blank">{{ text_help_link }} TikTok</a></div>
+	   	  <div class="help-link"><a href="https://ads.tiktok.com/marketing_api/docs?rid=959icq5stjr" target="_blank">{{ text_help_link }} TikTok Marketing API</a></div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_tiktok_status" {% if remarketing_tiktok_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+		  <label class="col-sm-2 control-label">{{ entry_currency }} - Tiktok</label>
+		  <div class="col-sm-10">
+			<select name="remarketing_tiktok_currency" class="form-control">
+				{% for currency in currencies %}
+				{% if currency.code  ==  remarketing_tiktok_currency %}
+				<option value="{{ currency.code }}" selected="selected">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% else %}
+				<option value="{{ currency.code }}">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% endif %} 
+				{% endfor %}
+			</select>
+		 </div>
+		 </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_identifier }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_tiktok_identifier" value="{{ remarketing_tiktok_identifier }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_ratio }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_tiktok_ratio" value="{{ remarketing_tiktok_ratio }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+            <div class="col-sm-10">
+              <select name="remarketing_tiktok_id" class="form-control">
+                {% if remarketing_tiktok_id  ==  'id' %}
+                <option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_tiktok_id  ==  'model'  %}
+                <option value="id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                {% else %}
+				<option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div> 
+		  <legend>{{ text_tiktok_pixel }}</legend>	
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_script_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_tiktok_script_status" {% if remarketing_tiktok_script_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_pixel_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_tiktok_pixel_status" {% if remarketing_tiktok_pixel_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <legend>{{ text_tiktok_api }}</legend>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_server_side }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_tiktok_server_side" {% if remarketing_tiktok_server_side %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_token }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_tiktok_token" value="{{ remarketing_tiktok_token }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_api_ver }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_tiktok_api_ver" value="{{ remarketing_tiktok_api_ver }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_tiktok_test_code }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_tiktok_test_code" value="{{ remarketing_tiktok_test_code }}" class="form-control" />
+               </div>
+		  </div> 
+            <div class="form-group">
+              <label class="col-sm-2 control-label">{{ entry_tiktok_send_status }}</label>
+              <div class="col-sm-10">
+                <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				  {% for order_status in order_statuses %}
+                  <div class="checkbox">
+                    <label> {% if order_status.order_status_id in remarketing_tiktok_send_status %}
+                      <input type="checkbox" name="remarketing_tiktok_send_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                      {{ order_status.name }}
+                      {% else %}
+                      <input type="checkbox" name="remarketing_tiktok_send_status[]" value="{{ order_status.order_status_id }}" />
+                      {{ order_status.name }}
+                      {% endif %} </label>
+                  </div>
+                  {% endfor %} </div>
+               </div>
+            </div>
+			<div class="form-group">
+              <label class="col-sm-2 control-label">{{ entry_resend_status }}</label>
+              <div class="col-sm-10">
+                <select name="remarketing_tiktok_resend_status" class="form-control">
+				<option value="0">{{ text_not_selected }}</option>
+                  {% for order_status in order_statuses %}
+                  {% if order_status.order_status_id == remarketing_tiktok_resend_status %}
+                  <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                  {% else %}
+                  <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+		  </div>
+		   <div class="tab-pane" id="tab-snapchat">
+          <legend>{{ text_snapchat }}</legend>
+	   	  <div class="help-link"><a href="https://businesshelp.snapchat.com/s/topic/0TO0y000000YVdJGAW/snap-pixel?language=en_US" target="_blank">{{ text_help_link }} Snapchat</a></div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_snapchat_status" {% if remarketing_snapchat_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+		  <label class="col-sm-2 control-label">{{ entry_currency }}</label>
+				<div class="col-sm-10">
+			<select name="remarketing_snapchat_currency" class="form-control">
+				{% for currency in currencies %}
+				{% if currency.code  ==  remarketing_snapchat_currency %}
+				<option value="{{ currency.code }}" selected="selected">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% else %}
+				<option value="{{ currency.code }}">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% endif %} 
+				{% endfor %}
+			</select>
+		 </div>
+		 </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_snapchat_identifier }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_snapchat_identifier" value="{{ remarketing_snapchat_identifier }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_snapchat_ratio }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_snapchat_ratio" value="{{ remarketing_snapchat_ratio }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+            <div class="col-sm-10">
+              <select name="remarketing_snapchat_id" class="form-control">
+                {% if remarketing_snapchat_id  ==  'id' %}
+                <option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_snapchat_id  ==  'model'  %}
+                <option value="id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                {% else %}
+				<option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div> 
+		  <legend>{{ text_snapchat_pixel }}</legend>	
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_snapchat_script_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_snapchat_script_status" {% if remarketing_snapchat_script_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_snapchat_pixel_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_snapchat_pixel_status" {% if remarketing_snapchat_pixel_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  </div>
+		  <div class="tab-pane" id="tab-uet">
+          <legend>{{ text_uet }}</legend>
+	   	  <div class="help-link"><a href="https://help.ads.microsoft.com/#apex/ads/en/60118/-1" target="_blank">{{ text_help_link }} Microsoft</a></div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_uet_status" {% if remarketing_uet_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+          </div>
+          <div class="tab-pane" id="tab-telegram">
+          <legend>{{ text_telegram }}</legend>
+	   	  <div class="help-link"></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_telegram_status" {% if remarketing_telegram_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_telegram_bot_id }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_telegram_bot_id" value="{{ remarketing_telegram_bot_id }}" class="form-control" />
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_telegram_send_to_id }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_telegram_send_to_id" value="{{ remarketing_telegram_send_to_id }}" class="form-control" />
+               </div>
+		  </div>
+			<div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_telegram_send_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_telegram_send_status %}
+                        <input type="checkbox" name="remarketing_telegram_send_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_telegram_send_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+              </div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_telegram_message }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_telegram_message" rows="5" class="form-control">{{ remarketing_telegram_message }}</textarea>
+               </div>
+		  </div>
+		  </div>
+		  <div class="tab-pane" id="tab-google-reviews">
+          <legend>{{ text_google_reviews }}</legend>
+		  <div class="help-link"><a href="https://support.google.com/merchants/answer/7106244" target="_blank">{{ text_help_link }} Google</a></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_reviews_status" {% if remarketing_reviews_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_google_merchant_identifier }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_google_merchant_identifier" value="{{ remarketing_google_merchant_identifier }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_reviews_country }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_reviews_country" value="{{ remarketing_reviews_country }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_reviews_date }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_reviews_date" value="{{ remarketing_reviews_date }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group"> 
+            <label class="col-sm-2 control-label">{{ entry_feed_gtin }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_reviews_feed_gtin" value="{{ remarketing_reviews_feed_gtin }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group"> 
+            <label class="col-sm-2 control-label">{{ entry_feed_mpn }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_reviews_feed_mpn" value="{{ remarketing_reviews_feed_mpn }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group"> 
+            <label class="col-sm-2 control-label">{{ entry_feed_sku }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_reviews_feed_sku" value="{{ remarketing_reviews_feed_sku }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group"> 
+            <label class="col-sm-2 control-label">{{ entry_feed_asin }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_reviews_feed_asin" value="{{ remarketing_reviews_feed_asin }}" class="form-control" />
+                  </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_reviews_quick_order_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_reviews_quick_order_status" {% if remarketing_reviews_quick_order_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_feed_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_reviews_feed_status" {% if remarketing_reviews_feed_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+			  <br> 
+			  <a href="/index.php?route=extension/feed/remarketing_feed/googleReviews" target="_blank">{{ entry_feed_link }}</a>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_feed_anonymous }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_reviews_feed_anonymous" {% if remarketing_reviews_feed_anonymous %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  </div>
+		  <div class="tab-pane" id="tab-events">
+          <legend>{{ text_events }}</legend>
+			<div class="form-group">
+			<label class="col-sm-2 control-label">{{ entry_events_cart }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_events_cart" rows="5" class="form-control">{{ remarketing_events_cart }}</textarea>
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_events_cart_add }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_events_cart_add" rows="5" class="form-control">{{ remarketing_events_cart_add }}</textarea>
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_events_purchase }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_events_purchase" rows="5" class="form-control">{{ remarketing_events_purchase }}</textarea>
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_events_quick_purchase }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_events_quick_purchase" rows="5" class="form-control">{{ remarketing_events_quick_purchase }}</textarea>
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_events_wishlist }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_events_wishlist" rows="5" class="form-control">{{ remarketing_events_wishlist }}</textarea>
+               </div>
+			</div>
+		  </div>
+		  <div class="tab-pane" id="tab-esputnik">
+		  <legend>{{ text_esputnik }}</legend>
+		  <div class="help-link"><a href="https://esputnik.com/support/peredacha-dannyh-resursom-v1event" target="_blank">{{ text_help_link }} eSputnik</a></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_esputnik_status" {% if remarketing_esputnik_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <legend>WEB Tracking</legend>	
+		  <div class="help-link"><a href="https://esputnik.com/support/poluchenie-i-ustanovka-skripta-veb-trekinga" target="_blank">{{ text_help_link }} eSputnik</a></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_esputnik_webtracking_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_esputnik_webtracking_status" {% if remarketing_esputnik_webtracking_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  	<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_esputnik_webtracking_identifier }}</label>
+               <div class="col-sm-10">
+                  <input type="text" name="remarketing_esputnik_webtracking_identifier" value="{{ remarketing_esputnik_webtracking_identifier }}" class="form-control" />
+               </div>
+			</div> 
+		  <legend>API Tracking</legend>	
+		  <div class="help-link"><a href="https://esputnik.com/support/peredacha-dannyh-resursom-v1event" target="_blank">{{ text_help_link }} eSputnik</a></div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_esputnik_api_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_esputnik_api_status" {% if remarketing_esputnik_api_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_esputnik_login }}</label>
+               <div class="col-sm-10">
+                  <input type="text" name="remarketing_esputnik_login" value="{{ remarketing_esputnik_login }}" class="form-control" />
+               </div>
+			</div> 
+		  <div class="form-group">
+          <label class="col-sm-2 control-label">{{ entry_esputnik_password }}</label>
+             <div class="col-sm-10">
+                <input type="text" name="remarketing_esputnik_password" value="{{ remarketing_esputnik_password }}" class="form-control" />
+             </div>
+		  </div>
+		  <div class="form-group">
+          <label class="col-sm-2 control-label">{{ entry_esputnik_address_format }}</label>
+             <div class="col-sm-10">
+                <input type="text" name="remarketing_esputnik_address_format" value="{{ remarketing_esputnik_address_format }}" class="form-control" />
+             </div>
+		  </div>
+		  <div class="form-group">
+          <label class="col-sm-2 control-label">{{ entry_esputnik_ttn_field }}</label>
+             <div class="col-sm-10">
+                <input type="text" name="remarketing_esputnik_ttn_field" value="{{ remarketing_esputnik_ttn_field }}" class="form-control" />
+             </div>
+		  </div>
+			 <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_esputnik_initialized_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_esputnik_initialized_status %}
+                        <input type="checkbox" name="remarketing_esputnik_initialized_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_esputnik_initialized_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+             </div>
+			 <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_esputnik_inprogress_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_esputnik_inprogress_status %}
+                        <input type="checkbox" name="remarketing_esputnik_inprogress_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_esputnik_inprogress_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+             </div>
+			 <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_esputnik_delivered_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_esputnik_delivered_status %}
+                        <input type="checkbox" name="remarketing_esputnik_delivered_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_esputnik_delivered_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+             </div>
+			 <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_esputnik_cancelled_status }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+				{% for order_status in order_statuses %}
+                    <div class="checkbox">
+                      <label> {% if order_status.order_status_id in remarketing_esputnik_cancelled_status %}
+                        <input type="checkbox" name="remarketing_esputnik_cancelled_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                        {{ order_status.name }}
+                        {% else %}
+                        <input type="checkbox" name="remarketing_esputnik_cancelled_status[]" value="{{ order_status.order_status_id }}" />
+                        {{ order_status.name }}
+                        {% endif %} </label>
+                    </div>
+                    {% endfor %} </div>
+                 </div>
+             </div>
+		  </div>
+		   <div class="tab-pane" id="tab-ecommerce-ga4">
+		   <legend>{{ text_ecommerce_ga4 }} - (gtag.js)</legend>
+			<div class="help-link"><a href="https://developers.google.com/analytics/devguides/collection/ga4/ecommerce" target="_blank">{{ text_help_link }} Google</a></div>
+			<div class="help-link"><a href="https://opencartforum.com/files/tutorials/670-nastroyka-google-analytics-4-cherez-modul/" target="_blank">{{ text_help_link }} Opencartforum</a></div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_ecommerce_ga4_status" {% if remarketing_ecommerce_ga4_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+		  <label class="col-sm-2 control-label">{{ entry_currency }} - GA4</label>
+		  <div class="col-sm-10">
+			<select name="remarketing_ecommerce_currency" class="form-control">
+				{% for currency in currencies %}
+				{% if currency.code  ==  remarketing_ecommerce_currency %}
+				<option value="{{ currency.code }}" selected="selected">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% else %}
+				<option value="{{ currency.code }}">{{ '(' ~ currency.code ~ ') ' ~ currency.title }}</option>
+				{% endif %} 
+				{% endfor %}
+			</select>
+		 </div>
+		 </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+               <div class="col-sm-10">
+              <select name="remarketing_ecommerce_ga4_id" class="form-control">
+                {% if remarketing_ecommerce_ga4_id  ==  'id' %}
+                <option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_ecommerce_ga4_id  ==  'model'  %}
+                <option value="id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                {% else %}
+				<option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div> 
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_ecommerce_ga4_identifier }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_ecommerce_ga4_identifier" value="{{ remarketing_ecommerce_ga4_identifier }}" class="form-control" />
+                  </div>
+			</div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_ecommerce_ga4_selector }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="remarketing_ecommerce_ga4_selector" value="{{ remarketing_ecommerce_ga4_selector }}" class="form-control" />
+                  </div>
+			</div>
+			<div class="form-group">
+			 <label class="col-sm-2 control-label">{{ entry_ecommerce_ratio }}</label>
+               <div class="col-sm-10">
+                    <input type="text" name="remarketing_ecommerce_ratio" value="{{ remarketing_ecommerce_ratio }}" class="form-control" />
+               </div>
+			</div>
+			<legend>{{ text_ecommerce_ga4 }} (dataLayer)</legend>
+			<div class="help-link"><a href="https://developers.google.com/tag-manager/ecommerce-ga4?hl=ru" target="_blank">{{ text_help_link }} Google</a></div>
+			<div class="help-link"><a href="https://opencartforum.com/files/tutorials/670-nastroyka-google-analytics-4-cherez-modul/" target="_blank">{{ text_help_link }} Opencartforum</a></div>
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_ecommerce_status" {% if remarketing_ecommerce_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+           <legend>{{ text_ecommerce_ga4_measurement }}</legend>
+		   <div class="help-link"><a href="https://developers.google.com/analytics/devguides/collection/protocol/ga4?hl=ru" target="_blank">{{ text_help_link }} Google</a></div>
+		   <div class="help-link"><a href="https://opencartforum.com/files/tutorials/670-nastroyka-google-analytics-4-cherez-modul/" target="_blank">{{ text_help_link }} Opencartforum</a></div>
+		<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_ga4_only_purchase }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_ga4_only_purchase" {% if remarketing_ga4_only_purchase %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+			<div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_ecommerce_ga4_measurement_status" {% if remarketing_ecommerce_ga4_measurement_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+               <div class="col-sm-10">
+              <select name="remarketing_ecommerce_ga4_measurement_id" class="form-control">
+                {% if remarketing_ecommerce_ga4_measurement_id  ==  'id' %}
+                <option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_ecommerce_ga4_measurement_id  ==  'model'  %}
+                <option value="id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                {% else %}
+				<option value="id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_ecommerce_ga4_api_secret }}</label>
+               <div class="col-sm-10">
+                  <input type="text" name="remarketing_ecommerce_ga4_measurement_api_secret" value="{{ remarketing_ecommerce_ga4_measurement_api_secret }}" class="form-control" />
+               </div>
+			</div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_ecommerce_ga4_analytics_id }}</label>
+               <div class="col-sm-10">
+                  <input type="text" name="remarketing_ecommerce_ga4_analytics_id" value="{{ remarketing_ecommerce_ga4_analytics_id }}" class="form-control" />
+               </div>
+			</div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_remarketing_ecommerce_ga4_send_status }}</label>
+                  <div class="col-sm-10">
+                    <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+					{% for order_status in order_statuses %}
+                      <div class="checkbox">
+                        <label> {% if order_status.order_status_id in remarketing_ecommerce_ga4_send_status %}
+                          <input type="checkbox" name="remarketing_ecommerce_ga4_send_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                          {{ order_status.name }}
+                          {% else %}
+                          <input type="checkbox" name="remarketing_ecommerce_ga4_send_status[]" value="{{ order_status.order_status_id }}" />
+                          {{ order_status.name }}
+                          {% endif %} </label>
+                      </div>
+                      {% endfor %} </div>
+                   </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_remarketing_ecommerce_ga4_refund_status }}</label>
+                  <div class="col-sm-10">
+                    <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+					{% for order_status in order_statuses %}
+                      <div class="checkbox">
+                        <label> {% if order_status.order_status_id in remarketing_ecommerce_ga4_refund_status %}
+                          <input type="checkbox" name="remarketing_ecommerce_ga4_refund_status[]" value="{{ order_status.order_status_id }}" checked="checked" />
+                          {{ order_status.name }}
+                          {% else %}
+                          <input type="checkbox" name="remarketing_ecommerce_ga4_refund_status[]" value="{{ order_status.order_status_id }}" />
+                          {{ order_status.name }}
+                          {% endif %} </label>
+                      </div>
+                      {% endfor %} </div>
+                   </div>
+                </div>
+				<div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_resend_status }}</label> 
+                  <div class="col-sm-10">
+                    <select name="remarketing_ecommerce_ga4_resend_status" class="form-control">
+					<option value="0">{{ text_not_selected }}</option>
+                      {% for order_status in order_statuses %}
+                      {% if order_status.order_status_id == remarketing_ecommerce_ga4_resend_status %}
+                      <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                      {% else %}
+                      <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                      {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+		   </div>
+		   <div class="tab-pane" id="tab-counters">
+		   <legend>{{ text_counters }}</legend>
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_counter1 }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_counter1" rows="10" class="form-control">{{ remarketing_counter1 }}</textarea>
+               </div>
+		   </div>
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_counter_bot }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_counter_bot" rows="10" class="form-control">{{ remarketing_counter_bot }}</textarea>
+               </div>
+		   </div>
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_counter2 }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_counter2" rows="10" class="form-control">{{ remarketing_counter2 }}</textarea>
+               </div>
+		   </div>
+		   <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_counter3 }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_counter3" rows="10" class="form-control">{{ remarketing_counter3 }}</textarea>
+               </div>
+		   </div>
+		  </div>
+		   <div class="tab-pane" id="tab-feed">
+		   <legend>{{ text_feed }}</legend>
+		   <div class="help-link"><a href="https://support.google.com/merchants/answer/7052112?hl=ru" target="_blank">{{ text_help_link }} Google</a></div>
+		   <div class="help-link"><a href="https://www.facebook.com/business/help/125074381480892?id=725943027795860" target="_blank">{{ text_help_link }} Facebook (Meta)</a></div>
+		   <div class="help-link"><a href="https://ads.tiktok.com/help/article?aid=10001006" target="_blank">{{ text_help_link }} Tiktok</a></div>
+		   <div class="help-link"><a href="https://opencartforum.com/files/tutorials/683-nastroyka-fida-dlya-google-merchant-facebook-tiktok-cherez-modul/" target="_blank">{{ text_help_link }} Opencartforum</a></div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_status" {% if remarketing_feed_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+			<label class="col-sm-2 control-label">{{ entry_currency }}</label>
+			  <div class="col-sm-10">
+                 <select name="remarketing_feed_currency" class="form-control">
+                    {% for currency in currencies %}
+                        {% if currency.code == remarketing_feed_currency %}
+							<option value="{{ currency.code }}" selected="selected">({{ currency.code }}) {{ currency.title }}</option>
+                        {% else %}
+							<option value="{{ currency.code }}">({{ currency.code }}) {{ currency.title }}</option>
+                        {% endif %}
+                    {% endfor %}
+                 </select>
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-sm-2 control-label">{{ entry_remarketing_feed_currency_base }}</label>
+			  <div class="col-sm-10">
+                 <select name="remarketing_feed_currency_base" class="form-control">
+                    {% for currency in currencies %}
+                        {% if currency.code == remarketing_feed_currency_base %}
+							<option value="{{ currency.code }}" selected="selected">({{ currency.code }}) {{ currency.title }}</option>
+                        {% else %}
+							<option value="{{ currency.code }}">({{ currency.code }}) {{ currency.title }}</option>
+                        {% endif %}
+                    {% endfor %}
+                 </select>
+			</div>
+		  </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ text_identifier }}</label>
+            <div class="col-sm-10">
+              <select name="remarketing_feed_identifier" class="form-control">
+                {% if remarketing_feed_identifier  ==  'product_id' %}
+                <option value="product_id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+                {% elseif  remarketing_feed_identifier  ==  'model' %}
+                <option value="product_id">{{ text_id }}</option>
+                <option value="model" selected="selected">{{ text_model }}</option>
+                 {% else %}
+				<option value="product_id" selected="selected">{{ text_id }}</option>
+                <option value="model">{{ text_model }}</option>
+				{% endif %} 
+              </select>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_key }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_key" value="{{ remarketing_feed_key }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_links }}</label>
+               <div class="col-sm-10">
+               		<b>{{ text_feed_merchant }}</b> <a href="{{ link_merchant }}{% if remarketing_feed_key %}&key={{ remarketing_feed_key }}{% endif %}" target="_blank"><b>{{ link_merchant }}{% if remarketing_feed_key %}&key={{ remarketing_feed_key }}{% endif %}</b></a><br>
+					<b>{{ text_feed_facebook }}</b> <a href="{{ link_facebook }}{% if remarketing_feed_key %}&key={{ remarketing_feed_key }}{% endif %}" target="_blank"><b>{{ link_facebook }}{% if remarketing_feed_key %}&key={{ remarketing_feed_key }}{% endif %}</b></a><br>
+					<b>{{ text_feed_tiktok }}</b> <a href="{{ link_tiktok }}{% if remarketing_feed_key %}&key={{ remarketing_feed_key }}{% endif %}" target="_blank"><b>{{ link_tiktok }}{% if remarketing_feed_key %}&key={{ remarketing_feed_key }}{% endif %}</b></a><br>
+					<br> 
+
+					<b>{{ text_feed_help }}</b>
+               </div>
+			</div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_adult }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_adult" {% if remarketing_feed_adult %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_condition }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_condition" value="{{ remarketing_feed_condition }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_gtin }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_gtin" value="{{ remarketing_feed_gtin }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_mpn }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_mpn" value="{{ remarketing_feed_mpn }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_highlight }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_highlight" value="{{ remarketing_feed_highlight }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_replace_description }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_replace_description" value="{{ remarketing_feed_replace_description }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_color }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_color" value="{{ remarketing_feed_color }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_size }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_size" value="{{ remarketing_feed_size }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_material }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_material" value="{{ remarketing_feed_material }}" class="form-control" />
+                </div> 
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_gender }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_gender" value="{{ remarketing_feed_gender }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_age_group }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_age_group" value="{{ remarketing_feed_age_group }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_store_code }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_store_code" value="{{ remarketing_feed_store_code }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_all_attributes }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_all_attributes" {% if remarketing_feed_all_attributes %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_tuning }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_tuning" {% if remarketing_feed_tuning %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div>
+
+			<div class="form-group {% if not remarketing_feed_tuning %}hidden{% endif %}">
+             <label class="col-sm-2 control-label">{{ entry_category }}
+			 <br>
+			 <a href="http://www.google.com/basepages/producttype/taxonomy-with-ids.ru-RU.xls" target="_blank">{{ text_category_google }}</a><br><br>
+			 <a href="https://support.google.com/merchants/answer/6324436?hl=ru" target="_blank">google_product_category HELP</a><br>
+			 <a href="https://support.google.com/merchants/answer/6324406?hl=ru" target="_blank">product_type HELP</a><br>
+			 <a href="https://support.google.com/merchants/answer/6324469?hl=ru" target="_blank">condition HELP</a><br>
+			 <a href="https://support.google.com/google-ads/answer/6275295?hl=ru" target="_blank"> custom_label HELP</a>
+			 </label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="max-height: 400px; overflow: auto;">
+                    <table class="table table-striped">
+                    {% for category in categories %}
+                    <tr class="feed-category">
+                      <td class="checkbox">
+                        <label>
+						  {% if category.category_id in remarketing_feed_category %}
+                          <input type="checkbox" name="remarketing_feed_category[]" value="{{ category.category_id }}" checked="checked" />
+                          <b>{{ category['name'] }}</b>
+                          {% else %}
+                          <input type="checkbox" name="remarketing_feed_category[]" value="{{ category.category_id }}" />
+                          <b>{{ category['name'] }}</b>
+                          {% endif %}
+                        </label>
+						<table class="table table-striped table-bordered">
+							<tr>
+								<td class="text-left gpc">google_product_category <input type="text" name="remarketing_feed_category_google_category[{{category.category_id}}]" value="{{ remarketing_feed_category_google_category[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left gpt">product_type <input type="text" name="remarketing_feed_category_product_type[{{category.category_id}}]" value="{{ remarketing_feed_category_product_type[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left">condition <input type="text" name="remarketing_feed_category_condition[{{category.category_id}}]" value="{{ remarketing_feed_category_condition[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left">custom_label_0 <input type="text" name="remarketing_feed_category_custom_label_0[{{category.category_id}}]" value="{{ remarketing_feed_category_custom_label_0[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left">custom_label_1 <input type="text" name="remarketing_feed_category_custom_label_1[{{category.category_id}}]" value="{{ remarketing_feed_category_custom_label_1[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left">custom_label_2 <input type="text" name="remarketing_feed_category_custom_label_2[{{category.category_id}}]" value="{{ remarketing_feed_category_custom_label_2[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left">custom_label_3 <input type="text" name="remarketing_feed_category_custom_label_3[{{category.category_id}}]" value="{{ remarketing_feed_category_custom_label_3[category.category_id] }}" class="form-control"/></td>
+								<td class="text-left">custom_label_4 <input type="text" name="remarketing_feed_category_custom_label_4[{{category.category_id}}]" value="{{ remarketing_feed_category_custom_label_4[category.category_id] }}" class="form-control"/></td>
+							</tr>
+						</table>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    </table>
+                  </div>
+                  <a onclick="$(this).parent().find(':checkbox').prop('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(':checkbox').prop('checked', false);">{{ text_unselect_all }}</a><br><br>
+				  <a onclick="copyToGpc();">{{ text_copy_to_category }}</a><br>
+				  <a onclick="copyToGpt();">{{ text_copy_to_product_type }}</a><br><br>
+				  <script>
+				  function copyToGpc() {
+					  $('.feed-category').each(function(){
+						  $(this).find('.gpc input').val($(this).find('.checkbox b').text());
+					  })
+				  }
+				  function copyToGpt() {
+					  $('.feed-category').each(function(){
+						  $(this).find('.gpt input').val($(this).find('.checkbox b').text());
+					  })
+				  }
+				  </script>
+          </div>
+          </div>
+		  <div class="form-group {% if not remarketing_feed_tuning %}hidden{% endif %}">
+             <label class="col-sm-2 control-label">{{ entry_manufacturer }}</label>
+                <div class="col-sm-10">
+                  <div class="well well-sm" style="max-height: 400px; overflow: auto;">
+                    <table class="table table-striped">
+                    {% for manufacturer in manufacturers %}
+                    <tr>
+                      <td class="checkbox">
+                        <label>
+						  {% if manufacturer.manufacturer_id in remarketing_feed_manufacturer %}
+                          <input type="checkbox" name="remarketing_feed_manufacturer[]" value="{{ manufacturer['manufacturer_id'] }}" checked="checked" />
+                          {{ manufacturer.name }}
+                          {% else %}
+                          <input type="checkbox" name="remarketing_feed_manufacturer[]" value="{{ manufacturer['manufacturer_id'] }}" />
+                          {{ manufacturer.name }}
+                          {% endif %}
+                        </label>
+                      </td>
+                    </tr>
+                     {% endfor %}
+                    </table>
+                  </div>
+                  <a onclick="$(this).parent().find(':checkbox').prop('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(':checkbox').prop('checked', false);">{{ text_unselect_all }}</a></div>
+          </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_customer_group }}</label>
+                  <div class="col-sm-10">
+                    <select name="remarketing_feed_customer_group" class="form-control">
+                      {% for customer_group in customer_groups %}
+                      {% if customer_group.customer_group_id == remarketing_feed_customer_group %}
+                      <option value="{{ customer_group.customer_group_id }}" selected="selected">{{ customer_group.name }}</option>
+                      {% else %}
+                      <option value="{{ customer_group.customer_group_id }}">{{ customer_group.name }}</option>
+                      {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_custom_sql }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_custom_sql" value="{{ remarketing_feed_custom_sql }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_special }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_special" {% if remarketing_feed_special %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_min_price }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_min_price" value="{{ remarketing_feed_min_price }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_max_price }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_max_price" value="{{ remarketing_feed_max_price }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_zero_quantity }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_zero_quantity" {% if remarketing_feed_zero_quantity %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_always_avail }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_always_avail" {% if remarketing_feed_always_avail %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+              <label class="col-sm-2 control-label">{{ entry_remarketing_feed_in_stock }}</label>
+              <div class="col-sm-10">
+              <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+			    {% for stock_status in stock_statuses %}
+                <div class="checkbox">
+                  <label> {% if stock_status.stock_status_id in remarketing_feed_in_stock %}
+                    <input type="checkbox" name="remarketing_feed_in_stock[]" value="{{ stock_status.stock_status_id }}" checked="checked" />
+                    {{ stock_status.name }}
+                    {% else %}
+                    <input type="checkbox" name="remarketing_feed_in_stock[]" value="{{ stock_status.stock_status_id }}" />
+                    {{ stock_status.name }}
+                    {% endif %} </label>
+                </div>
+                {% endfor %} </div>
+             </div>
+          </div>
+		  <div class="form-group">
+              <label class="col-sm-2 control-label">{{ entry_remarketing_feed_out_of_stock }}</label>
+              <div class="col-sm-10">
+              <div class="well well-sm" style="height: 150px; overflow: auto;"> 
+			    {% for stock_status in stock_statuses %}
+                <div class="checkbox">
+                  <label> {% if stock_status.stock_status_id in remarketing_feed_out_of_stock %}
+                    <input type="checkbox" name="remarketing_feed_out_of_stock[]" value="{{ stock_status.stock_status_id }}" checked="checked" />
+                    {{ stock_status.name }}
+                    {% else %}
+                    <input type="checkbox" name="remarketing_feed_out_of_stock[]" value="{{ stock_status.stock_status_id }}" />
+                    {{ stock_status.name }}
+                    {% endif %} </label>
+                </div>
+                {% endfor %} </div>
+             </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_original_description }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_original_description" {% if remarketing_feed_original_description %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group"> 
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_rich_text }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_rich_text" {% if remarketing_feed_rich_text %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_ocstore_main }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_ocstore_main" {% if remarketing_feed_ocstore_main %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_last_category }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_last_category" {% if remarketing_feed_last_category %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_type_category }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_type_category" {% if remarketing_feed_type_category %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_multiplier }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_multiplier" value="{{ remarketing_feed_multiplier }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_original_image_status }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_original_image_status" {% if remarketing_feed_original_image_status %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_additional_images }}</label>
+            <div class="col-sm-10">
+			  <label class="switch">
+					<input type="checkbox" name="remarketing_feed_additional_images" {% if remarketing_feed_additional_images %}checked{% endif %} >
+					<span class="slider round"></span>
+				</label>
+            </div>
+          </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_utm }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_utm" value="{{ remarketing_feed_utm }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_utm_facebook }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_utm_facebook" value="{{ remarketing_feed_utm_facebook }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_utm_tiktok }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_utm_tiktok" value="{{ remarketing_feed_utm_tiktok }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_empty_brand }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_empty_brand" value="{{ remarketing_feed_empty_brand }}" class="form-control" />
+                </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_description }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_feed_description" rows="5" class="form-control">{{ remarketing_feed_description }}</textarea>
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_short_desc }}</label>
+                <div class="col-sm-10">
+					<input type="text" name="remarketing_feed_short_desc" value="{{ remarketing_feed_short_desc }}" class="form-control" />
+                </div>
+		  </div> 
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_replace_from }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_feed_replace_from" rows="5" class="form-control">{{ remarketing_feed_replace_from }}</textarea>
+               </div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_remarketing_feed_replace_to }}</label>
+               <div class="col-sm-10">
+				    <textarea name="remarketing_feed_replace_to" rows="5" class="form-control">{{ remarketing_feed_replace_to }}</textarea>
+               </div>
+		  </div>
+	      </div>
+		  <div class="tab-pane" id="tab-help">
+		   <legend>{{ text_help }}</legend>
+		   {{ text_credits }}
+		  </div>
+		  </div>
+		  </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+	$.ajax({ 
+		type: 'post',
+		url:  '{{ check_version }}',
+		data: {'version': '{{ version }}'},
+		dataType: 'text',
+		success: function(response) { 
+			if (response != '') {
+				$('.version-update').html(response);
+			}
+		}
+	});
+})
+</script>
+<style>
+.config-summary span {
+	font-size:20px;
+	color:#0043ff;
+	font-weight:bold;
+}
+.version {
+    color: green;
+	font-weight:bold;
+}
+.summary-heading {
+	font-size:20px;
+	color:green;
+	margin-bottom: 15px;
+}
+.enabled, .enabled:hover {
+	background: #c7ffc7 !important;
+    font-weight: bold;
+}
+.version-update {
+	background: #c7ffc7 !important;
+    font-weight: bold;
+	margin-left:15px;
+}
+.diag, .diag:hover{
+    background: #00b9ff !important;
+    color: #fff !important;
+}
+legend {
+	font-size:30px;
+	margin-top:15px;
+}
+.help-link{
+	font-size: 22px;
+}
+.help-link a{
+	color: red;
+}
+.nav li a {
+font-weight: bold;
+}
+.nav-pills > li.active > a.enabled, .nav-pills > li.active > a.enabled:hover, .nav-pills > li.active > a.enabled:focus {
+color: red;
+}
+</style>
+<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.form-group select.form-control {
+text-align:left;
+max-width:300px;
+}
+.selectric-wrapper{
+text-align:left;
+max-width:300px;
+}
+</style>
+{{ footer }}

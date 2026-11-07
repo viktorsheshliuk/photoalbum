@@ -1,0 +1,48 @@
+<div id="uni-slideshow_v2-{{ module }}" class="uni-slideshow_v2 row-flex {{ hide ? 'hidden-xs' }}">
+	{% for key, slide in slides %}
+		<div class="uni-slideshow_v2__item item-{{ key }} {{ slide.text_over_image ? 'text-over-image' }} {{ slide.link ? 'uni-href' }}" {{ slide.link ? 'data-href="'~slide.link~'"' }} style="max-height:{{ max_height }}px">
+			<picture class="uni-slideshow_v2__image {{ slide.text_over_image ? 'text-over-image' }} {{ slide.has_text ? 'has-text' }}">
+				{% if slide.image_mobile %}
+					<source srcset="{{ slide.image_mobile }}" media="(max-width:575px)" />
+				{% endif %}
+				<source srcset="{{ slide.images }}" />
+				<img src="{{ slide.image }}" class="uni-slideshow_v2__img" alt="{{ slide.title }}" width="{{ slide.width }}" height="{{ slide.height }}" {{ key > 0 ? 'loading="lazy"' }} />
+			</picture>
+			{% if slide.title and slide.text and slide.button %}
+				<div class="uni-slideshow_v2__description {{ slide.text_over_image ? 'text-over-image' }} {{ slide.text_hide_mobile ? 'hide-in-mobile' }}">
+					<div class="uni-slideshow_v2__title">{{ slide.title }}</div>
+					<div class="uni-slideshow_v2__text">{{ slide.text }}</div>
+					<div class="uni-slideshow_v2__btns">
+						<button class="uni-slideshow_v2__btn uni-href btn btn-lg" data-href="{{ slide.link }}">{{ slide.button }}</button>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+</div>
+<script>
+var hide = {{ hide ? 'true' : 'false' }};
+
+if(!hide || hide && $(window).width() > 767) {
+	//setTimeout(() => {			
+	//	if(!$('#column-left, #column-right').is(':visible')) $('.uni-slideshow_v2__item').removeAttr('style');
+	//}, 50);
+	
+	$('head').append('<style>@media (max-width:767px) {.uni-slideshow_v2__img {height:{{ max_height_mobile }}px !important} }</style>');
+	
+	$('#uni-slideshow_v2-{{ module }}').addClass('owl-carousel').owlCarousel({
+		items:1,
+		autoplay:true,
+		{% if effect_in != 'disabled' and effect_out != 'disabled' %}
+		animateIn:'{{ effect_in }}',
+		animateOut:'{{ effect_out }}',
+		{% endif %}
+		autoplayTimeout:{{ delay > 0 ? delay*1000 : 5000 }},
+		autoplayHoverPause:true,
+		mouseDrag:{{ slides|length > 1 ? 'true' : 'false' }},
+		nav:true,
+		loop:true,
+		navText: ['<i class="fa fa-chevron-left"></i>', '<i class="fa fa-chevron-right"></i>'],
+	});
+}
+</script>

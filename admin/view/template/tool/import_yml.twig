@@ -1,0 +1,75 @@
+{{ header }} {{ column_left }} 
+<div id="content">
+	<div class="page-header">
+	<div class="container-fluid">
+	<div class="row">
+	<div class="col-md-8">
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %} 
+				<li><a href="{{ breadcrumb.href }} ">{{ breadcrumb.text }} </a></li>
+				{% endfor %} 
+			</ul>
+	</div>
+	<div class="col-md-4" style="text-align: right;">
+		<a onclick="$('#form').submit();" class="btn btn-primary"><span><i class="fa fa-upload"></i> {{ button_import }} </span></a>
+	</div>
+	</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">  
+		{% if error_warning %} 
+		<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %} 
+		{% if success %} 
+		<div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }} 
+			<button type="button" form="form-backup" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %} 
+	<div class="panel panel-default">
+		<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-exchange"></i> {{ heading_title }} </h3>
+		</div>
+		<div class="panel-body">
+			<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form" class="form-horizontal">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">{{ entry_restore }}</label>
+					<div class="col-sm-10"><input type="file" name="import_yml_upload" /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_url_help }}">{{ entry_url }}</span></label>
+					<div class="col-sm-10"><input type="text" name="import_yml_url" class="form-control" value="{% if settings.import_yml_url %}{{ settings.import_yml_url }}{% endif %}"/></div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">{{ entry_update }}</label>
+					<div class="col-sm-10">
+							<input type="checkbox" name="import_yml_name" {% if settings.import_yml_name  and  settings.import_yml_name == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_name }} <br />
+							<input type="checkbox" name="import_yml_description" {% if settings.import_yml_description  and  settings.import_yml_description == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_description }} <br />
+				<input type="checkbox" name="import_yml_category" {% if settings.import_yml_category  and  settings.import_yml_category == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_category }} <br />
+							<input type="checkbox" name="import_yml_price" {% if settings.import_yml_price  and  settings.import_yml_price == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_price }} <br />
+							<input type="checkbox" name="import_yml_image" {% if settings.import_yml_image  and  settings.import_yml_image == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_image }} <br />
+							<input type="checkbox" name="import_yml_manufacturer" {% if settings.import_yml_manufacturer  and  settings.import_yml_manufacturer == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_manufacturer }} <br />
+							<input type="checkbox" name="import_yml_attributes" {% if settings.import_yml_attributes  and  settings.import_yml_attributes == 'on' %} {{ 'checked="checked"' }} {% endif %} />{{ entry_field_attribute }} <br />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">{{ entry_force }}</label>
+					<div class="col-sm-10"><input type="checkbox" name="import_yml_force" {% if settings.import_yml_force  and  settings.import_yml_force == 'on' %} {{ 'checked="checked"' }} {% endif %} /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">{{ entry_save_settings }}</label>
+					<div class="col-sm-10">
+							<a onclick="$('#form').attr('action', '{{ save }}'); $('#form').submit();" class="btn btn-primary"><span><i class="fa fa-floppy-o"></i> {{ button_save }} </span></a>
+					</div>
+				</div>
+			</form>
+			<br>
+			<div style="background: #233746;color: #ffffff;font-size: 130%;padding: 10px;border-color: #233746;border-radius: 3px;margin-top: 20px;">Еще больше модулей и шаблонов для Opencart 3.x <a style="color: #fffc00;" href="http://opencart3x.ru/">на нашем сайте</a>!</div>
+		</div>
+	</div>
+	</div>
+</div>
+{{ footer }} 

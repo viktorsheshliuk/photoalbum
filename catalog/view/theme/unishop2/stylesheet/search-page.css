@@ -1,0 +1,11 @@
+.search-page__search-block{margin:0 0 40px;padding:20px;background:rgba(0, 0, 0, .03);border-radius:4px}
+.search-page__search-input {position:relative;flex:1 1 auto;margin:0 20px 0 0}
+.search-page__search-input .form-control {height:38px}
+.search-page__search-category {margin:0 20px 0 0}
+.search-page__search-category .form-control {height:38px}
+
+@media (max-width:767px){
+	.search-page__search-input{margin:0}
+	.search-page__search-category{flex:1 1 100%;margin:0}
+	.search-page__search-delimiter{flex:1 1 100%;margin:0 0 20px}
+}

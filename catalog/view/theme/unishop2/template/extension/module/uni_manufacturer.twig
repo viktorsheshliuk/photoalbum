@@ -1,0 +1,30 @@
+{% if manufacturers %}
+	{% if manufacturer_view_res == 768 %}
+		{% set class = 'hidden-xs' %}
+	{% elseif manufacturer_view_res == 992 %}
+		{% set class = 'hidden-xs hidden-sm' %}
+	{% elseif manufacturer_view_res == 1200 %}
+		{% set class = 'hidden-sm hidden-sm hidden-md' %}
+	{% else %}
+		{% set class = '' %}
+	{% endif %}
+	<div id="manufacturer_module" class="manufacturer-module row {{class}}">
+		<div class="col-xs-12">
+			<div class="manufacturer-module__heading heading">{{ heading_title }}</div>
+			<ul class="manufacturer-module__ul">
+				{% for manufacturer in manufacturers %}
+					<li class="manufacturer-module__item">
+						<a class="manufacturer-module__item-name uni-href" data-href="{{ href }}#{{ manufacturer.name }}">{{ manufacturer.name }}</a>
+						{% if manufacturer.manufacturer %}
+							<ul class="manufacturer-module__childrens">
+								{% for manufacturer in manufacturer.manufacturer %}
+									<li class="manufacturer-module__children"><a class="uni-href" data-href="{{ manufacturer.href }}">{{ manufacturer.name }}</a></li>
+								{% endfor %} 
+							</ul>
+						{% endif %}
+					</li>
+				{% endfor %} 
+			</ul> 
+		</div>
+	</div>
+{% endif %}

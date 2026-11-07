@@ -1,0 +1,293 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<br />
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+			<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+			</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+					<div class="form-group" style="padding-top:0;">
+						<label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+						<div class="col-sm-10">
+							<input type="text" name="name" value="{{ name }}" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_module_title }}</label>
+						<div class="col-sm-10">
+							<ul class="nav nav-tabs">
+								{% for lang in languages %}
+									<li><a href="#module-title-{{ lang.language_id }}" data-toggle="tab"><img src="language/{{ lang.code }}/{{ lang.code }}.png" title="{{ lang.name }}" /></a></li>
+								{% endfor %}
+							</ul>
+							<div class="tab-content">
+								{% for lang in languages %}
+									<div id="module-title-{{ lang.language_id }}" class="tab-pane">
+										<input type="text" name="title[{{ lang.language_id }}]" value="{{ title[lang.language_id] }}" placeholder="{{ text_example_title }}" class="form-control" />
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					<div class="form-group">	
+						<label class="col-sm-2 control-label"></label>
+						<div class="col-sm-10">
+							<!--
+							<select name="store_id" class="form-control">
+								{% for store in stores %}
+									<option value="{{ store.store_id }}">{{ store.name }}</option>
+								{% endfor %}
+							</select>
+							<hr />
+							-->
+							<button type="button" class="btn btn-sm btn-primary" onclick="addCategoryBlock()">{{ button_add_block }}</button>
+							<hr />
+							
+							<div class="category-blocks">
+								<ul class="nav nav-tabs">
+									{% for category in categories %}
+										{% if category.category_id > 0 %}
+											<li><a href="#category-block-{{ category.category_id }}" data-toggle="tab">{{ category.name }}</a></li>
+										{% endif %}
+									{% endfor %}
+								</ul>
+								<div class="tab-content">
+									{% for category in categories %}
+										{% if category.category_id > 0 %}
+											<div id="category-block-{{ category.category_id }}" class="tab-pane">
+												<input type="text" name="categories[{{ category.category_id }}]" value="{{ category.path }}" class="main-category form-control" placeholder="{{ text_select_main_category }}" />
+												<div style="height:20px"></div>
+												<div class="category-block-childs well well-sm" style="height:200px;overflow:auto">
+													{% for key, child in category.child %}
+														<label style="display:block;margin:0 0 5px">
+															<input type="checkbox" name="categories[{{ category.category_id }}][child][{{ child.category_id }}]" value="{{ child.category_id }}" {{ child.category_id in categories_selected[category.category_id].child[key] ? 'checked="checked"' }} />  <span>{{ child.name }}</span>
+														</label>
+													{% endfor %}
+												</div>
+												<input type="text" name="categories[{{ category.category_id }}][sort_order]" value="{{ category.sort_order ? category.sort_order : 1 }}" class="sort-order form-control" placeholder="{{ text_sorts }}" />
+												<div style="height:20px"></div>
+												<button type="button" class="btn btn-sm btn-danger" onclick="removeCategoryBlock(this)">{{ button_delete_block }}</button>
+											</div>
+										{% endif %}
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_image }}</label>
+						<div class="col-sm-10">
+							<div class="input-group" style="width:250px">
+								<input type="text" name="image_width" value="{{ image_width }}" class="form-control" style="width:50% !important; text-align:center;" />
+								<input type="text" name="image_height" value="{{ image_height }}" class="form-control" style="width:50% !important; text-align:center;" />
+								<span class="input-group-addon">пикс.</span>
+								{% if error_image %}<span class="error">{{ error_image }}</span>{% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_type }}</label>
+						<div class="col-sm-10">
+							{% set typeArr = {2: text_type_2, 1: text_type_1} %}
+							<select name="type" class="form-control">
+								{% for key, t in typeArr %}
+									<option value="{{ key }}" {{ key == type ? 'selected="selected"' }}>{{ t }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-name">{{ entry_show_column }}</label>
+						<div class="col-sm-10">
+							{% set columnsHD = [1, 2, 3, 4, 6] %}
+							{% set columnsFHD = [3, 4, 5, 6, 8, 10] %}
+							<div style="display:table-cell;padding:5px 5px 0 0">
+								<div class="input-group">
+									<span class="input-group-addon">Десктоп FullHD:</span>
+									<select name="columns[]" class="form-control" style="width:70px;">
+									{% for column in columnsFHD %}
+										<option value="{{ column }}" {{ column in columns.0 ? 'selected="selected"' }}>{{ column }}</option>
+									{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div style="display:table-cell;padding:5px 5px 0 0">
+								<div class="input-group">
+									<span class="input-group-addon">Десктоп:</span>
+									<select name="columns[]" class="form-control" style="width:55px;">
+									{% for column in columnsHD %}
+										<option value="{{ column }}" {{ column == columns.1 ? 'selected="selected"' }}>{{ column }}</option>
+									{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div style="display:table-cell;padding:5px 5px 0 0">
+								<div class="input-group">
+									<span class="input-group-addon">Ноутбук:</span>
+									<select name="columns[]" class="form-control" style="width:55px;">
+									{% for column in columnsHD %}
+										<option value="{{ column }}" {{ column in columns.2 ? 'selected="selected"' }}>{{ column }}</option>
+									{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div style="display:table-cell;padding:5px 5px 0 0">
+								<div class="input-group">
+									<span class="input-group-addon">Планшет:</span>
+									<select name="columns[]" class="form-control" style="width:55px;">
+									{% for column in columnsHD %}
+										<option value="{{ column }}" {{ column in columns.3 ? 'selected="selected"' }}>{{ column }}</option>
+									{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div style="display:table-cell;padding:5px 5px 0 0">
+								<div class="input-group">
+									<span class="input-group-addon">Смартфон:</span>
+									<select name="columns[]" class="form-control" style="width:55px;">
+									{% for column in columnsHD %}
+										<option value="{{ column }}" {{ column in columns.4 ? 'selected="selected"' }}>{{ column }}</option>
+									{% endfor %}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_module_view_type }}</label>
+						<div class="col-sm-10">
+							<div style="height:10px"></div>
+							<label><input type="checkbox" name="view_type" value="1" {{ view_type ? 'checked="checked"' }} class="form-control" /><span></span></label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-status">{{ entry_status }} </label>
+						<div class="col-sm-10">
+							<select name="status" id="input-status" class="form-control">
+								<option value="1" {{ status ? 'selected="selected"' }}>{{ text_enabled }}</option>
+								<option value="0" {{ status == 0 ? 'selected="selected"' }}>{{ text_disabled }}</option>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	function addCategoryBlock() {
+							
+		const key = 'new-' + $('.category-blocks > ul li').length;
+											
+		$('.category-blocks > ul').append('<li><a href="#category-block-'+key+'" data-toggle="tab">New block</a></li>');
+												
+		html = '<div id="category-block-'+key+'" class="tab-pane">';
+		html += '<input name="categories['+key+']" value="" class="main-category form-control" placeholder="{{ text_select_main_category }}" />';
+		html += '<div style="height:20px"></div>';
+		html += '<div class="category-block-childs well well-sm" style="height:200px;overflow:auto">';
+		html += '<div style="margin:0 0 5px"></div>';
+		html += '</div>';
+		html += '<input type="text" name="categories['+key+'][sort_order]" value="" class="sort-order form-control" placeholder="{{ text_sorts }}" />';
+		html += '<div style="height:20px"></div>';
+		html += '<button type="button" class="btn btn-sm btn-danger" onclick="removeCategoryBlock(this)">{{ button_delete_block }}</button>';
+		html += '</div>';
+												
+		$('.category-blocks .tab-content').append(html);
+								
+		$('.category-blocks ul li:last a').tab('show');
+	}
+							
+	let counter = 0;
+											
+	function removeCategoryBlock(elem) {
+		counter = 0;
+		parent = $(elem).parent();								
+	
+		$('.category-blocks ul li:eq('+getNumber(parent)+')').remove();
+		$(elem).parent().remove();
+		$('.category-blocks ul li:first a').tab('show');
+	}
+							
+	function getNumber(element) {
+		if ($(element).prev().length !== 0) {
+			counter++;
+			getNumber($(element).prev());
+		}
+ 
+		return counter;
+	}
+							
+	$('body').on('click', '.main-category', function() {
+								
+		const $this = $(this);
+							
+		$this.autocomplete({
+			'source': function(request, response) {
+				$.ajax({
+					url: 'index.php?route=extension/module/uni_category_wall_v2/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+					dataType: 'json',
+					success: function(json) {
+						response($.map(json, (item) => {
+							return {
+								label: item['name'],
+								value: item['category_id']
+							}
+						}));
+					}
+				});
+			},
+			'select': function(item) {
+				const category_id = item['value'];
+									
+				$this.attr('name', 'categories['+category_id+']').val(item['label']);
+				$this.parent().find('.sort-order').attr('name', 'categories['+category_id+'][sort_order]');
+										
+				$.get('index.php?route=extension/module/uni_category_wall_v2/autocomplete2&user_token={{ user_token }}&category_id='+category_id, (data) => {
+					html = '';
+											
+					$.map(data, (item) => {
+						html += '<label style="display:block;margin:0 0 5px"><input type="checkbox" name="categories['+category_id+'][child]['+item['category_id']+']" value="'+item['category_id']+'" /> <span>'+item['name']+'</span></label>';
+					});
+											
+					$this.parent().find('.category-block-childs').html(html)
+				});
+			}
+		});
+	});
+							
+	$('body').on('input', '.main-category', function() {
+		if(!$(this).val()) {
+			$(this).parent().find('.category-block-childs').html('')
+		}
+	});			
+</script>
+<script>
+	$(function() {
+		$('.nav-tabs').each(function() {
+			$(this).find('li:first a').tab('show');
+		});
+	});
+</script>
+{{ footer }}

@@ -1,0 +1,53 @@
+.quick-order__image{position:relative}
+.quick-order .sticker {top:10px;left:20px}
+.quick-order__image-main {position:relative;margin:0 0 20px;padding:10px}
+.quick-order__image-additional{margin:0 -10px 20px}
+.quick-order__image-additional img{padding:3px;font-size:.4em;border:solid 1px #e6e6e6;border-radius:4px;transition:all linear .15s}
+.quick-order__image-additional img.selected{border-color:#aaa}
+.quick-order__image-additional .owl-item{padding:0 10px;}
+.quick-order__image-additional .owl-nav button{width:28px;height:28px;line-height:28px;text-align:center;font-size:1em;background:rgba(255, 255, 255, 1);border:solid 1px rgba(0, 0, 0, .15);border-radius:100%}
+.quick-order__image-additional .owl-nav button:not(.disabled) {opacity:1}
+.quick-order__image-additional .owl-nav {left:-4px;right:-4px}
+.quick-order .qty-indicator {margin:20px 0 0}
+.quick-order__tab-content{margin:0 0 30px}
+.quick-order__description {line-height:1.7em}
+.quick-order__more{text-decoration:underline}
+.quick-order__option{margin:0 -10px 10px}
+.quick-order .qty-switch {margin:0 15px 0 0}
+.quick-order .qty-switch__input {width:40px;height:38px}
+.quick-order .qty-switch__btn{width:25px;height:19px;line-height:18px}
+.quick-order__image:hover .uni-timer {opacity:0}
+.quick-order__cart {display:flex;justify-content:center}
+.quick-order__price{margin:20px 0;font-size:1.9em}
+.quick-order__discount{display:flex;margin:-20px 0 25px;font-size:.8em}
+.quick-order__discount-item{margin:0 10px 0 0}
+.quick-order__minimum{margin:10px 0 0;font-size:.8em;color:#888;text-align:center}
+.quick-order .option__name{height:30px;line-height:27px;padding:0 10px}
+.quick-order .option__select{height:30px}
+.quick-order .option__img {width:34px}
+.quick-order__product {margin:0 0 15px}
+.quick-order__textblock{display:flex;margin:0 0 10px}
+.quick-order__textblock-inner{padding:15px 20px;font-size:.95em;border-radius:3px;background:rgba(0, 0, 0, .03)}
+.quick-order__agree{margin:0 0 20px;font-size:.95em}
+.quick-order__agree > label {justify-content:center}
+.quick-order__input {width:calc(50% - 7.5px);margin:0 0 15px}
+.quick-order__input:nth-child(odd) {margin:0 15px 15px 0}
+.quick-order__input.full-width{width:100%;margin:0 0 10px}
+
+.quick-order .captcha {display:flex;align-items:center;justify-content:center;padding:0;margin:10px -10px}
+.quick-order .captcha > * {width:auto}
+.quick-order .captcha__label {display:none}
+.quick-order .captcha__input{max-width:110px}
+.quick-order .g-recaptcha {transform-origin:center !important}
+
+.quick-order .product-data{display:flex;flex-direction:column;font-size:.95em}
+.quick-order .product-data__item{display:flex;align-items:flex-start;margin:0 0 5px}
+.quick-order .product-data__item-div{position:relative;width:50%;min-width:50%;display:flex;align-items:flex-end}
+.quick-order .product-data__item-div:first-child:after{position:relative;bottom:4px;flex:1 1 auto;content:'';margin:0 10px;border-bottom:dotted 1px #bbb}
+
+.product-download{background:#f7f7f7;padding:15px;border-radius:4px}
+.product-download__item{display:flex;align-items:center;margin:0 0 20px}
+.product-download__item:last-child{margin:0}
+.product-download__icon{padding:0 15px 0 0;font-size:2.2em;color:#888}
+.product-download__name {font-weight:500}
+.product-download__size {padding:0 0 0 15px;color:#888;font-size:.8em;white-space:nowrap}

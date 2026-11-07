@@ -1,0 +1,25 @@
+{% if modules or menu_expanded %}
+	<aside id="column-left" class="col-sm-4 col-md-3 col-lg-3 col-xxl-4 hidden-xs {{ route == 'common/home' ? 'hidden-sm' }}">
+		{% if menu_expanded %}
+			<script>
+				const new_margin = () => {
+					if($(window).width() > 992) {
+						$('#column-left').css('margin-top', ($('header .menu1 .menu__collapse').height() {{ route != 'common/home' ? '- $(".breadcrumb-h1").outerHeight()' }} + 5));
+					} else {
+						$('#column-left').css('margin-top', '');
+					}
+				}
+		
+				new_margin();
+		
+				$(window).resize(new_margin);
+			</script>
+		{% endif %}
+		{% for module in modules %}
+			{{ module }}
+		{% endfor %}
+	</aside>
+{% endif %}
+{% if modules is empty and menu_expanded %}
+	<script>$('head').append('<style>@media (min-width:767px) and (max-width:992px) { #content{width:100%} }</style>');</script>
+{% endif %}

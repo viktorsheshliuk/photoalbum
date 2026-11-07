@@ -1,0 +1,37 @@
+{% if articles %}
+	<div class="heading">{{ heading_title }}</div>
+	<div class="uni-module article-module articles-featured">
+		<div class="uni-module__wrapper row-flex">
+			{% for articles in articles %}
+				<div class="article-module__item uni-item">
+					{% if articles.thumb %}
+						<div class="article-module__image">
+							<img src="{{ articles.thumb }}" loading="lazy" alt="{{ articles.name }}" title="{{ articles.name }}" data-href="{{ articles.href }}" class="uni-href img-responsive" width="{{ img_width }}" height="{{ img_height }}" />
+						</div>
+					{% endif %}
+					<div class="article-module__description">
+						<div class="article-module__category-date-viewed">
+							<span class="article-module__date"><i class="fa fa-calendar"></i>{{ articles.date_added }}</span>
+							<span class="article-module__viewed"><i class="fa fa-eye"></i>{{ articles.viewed }}</span>
+							<span class="article-module__rating rating">
+								{% for i in 1..5 %}<i class="{{ article.rating < i ? 'far fa-star' : 'fa fa-star' }}"></i>{% endfor %} 
+							</span>
+						</div>
+						<a class="article-module__name" href="{{ articles.href }}" title="{{ articles.name }}">{{ articles.name }}</a>
+						<div class="article-module__text">
+							{{ articles.description }}
+							<a title="{{ text_more }}" data-toggle="tooltip" data-href="{{ articles.href }}" class="article-module__more uni-href">&rarr;</a>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	<script>
+		$('.articles-featured').uniModules({
+			type:'{{ type_view is defined ? type_view : 'carousel' }}',
+			items: {0:{items:1},700:{items:3},1050:{items:4},1400:{items:5}},
+			loop:{{ articles|length > 5 ? 'true' : 'false' }}
+		});
+	</script>
+{% endif %}

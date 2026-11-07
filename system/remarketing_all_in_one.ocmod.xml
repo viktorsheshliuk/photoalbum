@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>DEV-OPENCART.COM - Комплекс для SEO ремаркетинга (Remarketing)</name>
+  	<version>1</version>
+  	<link>https://DEV-OPENCART.COM</link>
+  	<author>DEV-OPENCART.COM</author>
+  	<code>dev_opencart_com_remarketing</code>
+    <file path="catalog/controller/common/header.php"> 
+        <operation error="skip">
+            <search><![CDATA[$data['title'] = $this->document->getTitle();]]></search>
+            <add position="after"><![CDATA[
+		// remarketing all in one 
+		$this->load->model('tool/remarketing');
+		if ($this->config->get('remarketing_status')) {
+			$data['remarketing_head'] = $this->load->controller('common/remarketing/header');
+		}
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+            $data['remarketing_body'] = $this->load->controller('common/remarketing/body');
+			$data['ecommerce_currency'] = $this->config->get('remarketing_ecommerce_currency');	
+			$data['ecommerce_ga4_identifier'] = $this->config->get('remarketing_ecommerce_ga4_identifier');
+			$this->model_tool_remarketing->getCid();  
+			$this->model_tool_remarketing->trackUtm();  
+			$this->document->addScript('catalog/view/javascript/sp_remarketing.js');
+		}
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/common/footer.php">
+        <operation error="skip">
+            <search><![CDATA[// Whos Online]]></search>
+            <add position="before"><![CDATA[
+			// remarketing all in one 
+			$this->load->model('tool/remarketing');
+			if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+				$data['remarketing_footer'] = $this->load->controller('common/remarketing/footer');
+				$data['remarketing_status'] = $this->config->get('remarketing_status');	
+			}
+			]]></add>
+        </operation>
+    </file>
+	<file path="catalog/controller/{checkout,extension/ocdevwizard/}/{success,smart_order_success_page_pro}.php">
+ 	<operation error="skip">
+      <search><![CDATA[unset($this->session->data['order_id']);]]></search>
+      <add position="replace">
+	  <![CDATA[//unset($this->session->data['order_id']);]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/product/product.php">
+	<operation error="skip">
+      <search><![CDATA[$this->model_catalog_product->updateViewed]]></search>
+      <add position="before">
+      <![CDATA[
+	    // remarketing all in one
+		$this->load->model('tool/remarketing');
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			if (empty($category_info)) $category_info = [];
+			$data = array_merge($data, $this->model_tool_remarketing->processProduct($product_info, $category_info));
+		}   
+	  ]]> 
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/product/{category,manufacturer,special,search}.php"> 
+	<operation error="skip">
+      <search index="0"><![CDATA[$results = $this->model_catalog_product->getProduct]]></search>
+      <add position="after">
+      <![CDATA[
+	  // remarketing all in one  
+	      $this->load->model('tool/remarketing');
+	      if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot() && !empty($results)) {
+		  	  if (empty($data['heading_title'])) $data['heading_title'] = $this->language->get('heading_title'); 
+		  	  $data = array_merge($data, $this->model_tool_remarketing->processCategory((!empty($category_info) ? $category_info : []), $data['heading_title'], $results));
+	      }  
+	  ]]>
+      </add>
+    </operation>
+   </file> 
+   <file path="catalog/controller/{checkout,extension/module/frametheme,madeshop,extension/soconfig,extension/basel}/{cart,ft_cart,basel_features}.php">
+	<operation error="skip">
+      <search><![CDATA[foreach ($product_options as $product_option) {]]></search>
+      <add position="before">
+      <![CDATA[
+	  $options = '';
+	  ]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[foreach ($product_options as $product_option) {]]></search>
+      <add position="after">
+      <![CDATA[
+	  if (!empty($option[$product_option['product_option_id']]) && !is_array($option[$product_option['product_option_id']])) {
+		  $options .= $product_option['name'] . ':' . $option[$product_option['product_option_id']] . ';';
+	  }
+	  $options = rtrim($options, ';');
+	  ]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[$this->cart->add(]]></search>
+      <add position="after">
+      <![CDATA[
+	    // remarketing all in one
+		$this->load->model('tool/remarketing'); 
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$json['remarketing'] = $this->model_tool_remarketing->remarketingAddToCart($product_info, $quantity, !empty($options) ? $options : '');
+		}  
+	  ]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[$this->cart->remove(]]></search>
+      <add position="before">
+      <![CDATA[
+		// remarketing all in one
+		$this->load->model('tool/remarketing');
+	    if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$this->load->model('catalog/product');
+			$product_info = [];
+			foreach ($this->cart->getProducts() as $product) {
+				if ($product['cart_id'] == $this->request->post['key']) {
+					$product_info = $this->model_catalog_product->getProduct($product['product_id']);
+					$quantity = $product['quantity'];
+					$json['remarketing'] = $this->model_tool_remarketing->remarketingRemoveFromCart($product_info, $quantity);
+				} 
+			}
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/account/wishlist.php">
+	<operation error="skip">
+      <search><![CDATA[$this->response->addHeader('Content-Type: application/json');]]></search>
+      <add position="before">
+      <![CDATA[
+		  // remarketing all in one
+		  $this->load->model('tool/remarketing');
+		  if ($this->config->get('remarketing_status') && $product_info && !$this->model_tool_remarketing->isBot()) {
+		  	  $json['remarketing'] = $this->model_tool_remarketing->remarketingWishlist($product_info);
+		  }
+	  ]]> 
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/model/checkout/order.php">
+	<operation error="skip">
+      <search><![CDATA[$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");]]></search>
+      <add position="after">
+	  <![CDATA[
+	    // remarketing all in one
+		$this->load->model('tool/remarketing');
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$this->model_tool_remarketing->processOrder($order_id, $order_status_id, $order_info);
+		}	
+		]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[return $order_id;]]></search>
+      <add position="before">
+	  <![CDATA[
+	  $this->session->data['remarketing_order_id'] = $order_id;
+	  setcookie('remarketing_order_id', $order_id, time() + 24 * 3600, '/');
+	  $this->load->model('tool/remarketing'); 
+	  $this->model_tool_remarketing->getOrderRemarketing($order_id);
+	  ]]>
+      </add>
+    </operation> 
+	<operation error="skip">
+      <search><![CDATA[$this->db->query("DELETE FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$order_id . "'");]]></search>
+      <add position="after">
+	    <![CDATA[
+		$this->db->query("DELETE FROM `" . DB_PREFIX . "remarketing_orders` WHERE order_id = '" . (int)$order_id . "'");
+		]]>
+      </add>
+    </operation>
+  </file>
+  <file path="admin/model/sale/order.php">
+	<operation error="skip">
+      <search><![CDATA[$this->db->query("DELETE FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$order_id . "'");]]></search>
+      <add position="after">
+	  <![CDATA[
+		$this->db->query("DELETE FROM `" . DB_PREFIX . "remarketing_orders` WHERE order_id = '" . (int)$order_id . "'");
+		]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/model/account/customer.php">
+	<operation error="skip">
+      <search><![CDATA[$customer_id = $this->db->getLastId();]]></search>
+      <add position="after">
+	  <![CDATA[
+	    // remarketing all in one
+		$this->load->model('tool/remarketing');
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			if ($this->config->get('remarketing_facebook_status') && $this->config->get('remarketing_facebook_server_side') && $this->config->get('remarketing_facebook_token')) {
+				$facebook_data['event_name'] = 'CompleteRegistration';
+				$fb_time = time();
+				$facebook_data['custom_data'] = [
+					'status' => true,
+					'currency' => $this->config->get('remarketing_facebook_currency'),
+					'value' => 1
+				];
+				$facebook_data['time'] = $fb_time;
+				$this->model_tool_remarketing->sendFacebook($facebook_data);
+			}
+			
+			if ($this->config->get('remarketing_esputnik_status') && $customer_id) {
+				if (isset($data['newsletter']) && $data['newsletter']) {
+					$create_contact_url = 'https://esputnik.com/api/v1/contact/subscribe';
+					$json_contact_value = new stdClass();
+					$contact = new stdClass();
+					$contact->firstName = $data['firstname'];
+					$contact->lastName = $data['lastname'];
+					$contact->contactKey = $customer_id;
+					$contact->id = $customer_id;
+					$contact->channels = [['type'=>'email', 'value' => $data['email']],['type'=>'sms', 'value' => $data['telephone']]];
+					$contact->groups = [['name'=>'Web Site']];
+					$json_contact_value->contact = $contact;
+					$json_contact_value->groups = ['Subscribers'];
+					$this->model_tool_remarketing->sendEsputnik($json_contact_value, $create_contact_url);
+				} else {
+					$create_contact_url = 'https://esputnik.com/api/v1/contact';
+					$contact = new stdClass();
+					$contact->firstName = $data['firstname'];
+					$contact->lastName = $data['lastname'];
+					$contact->contactKey = $customer_id;
+					$contact->id = $customer_id;
+					$contact->channels = [['type'=>'email', 'value' => $data['email']],['type'=>'sms', 'value' => $data['telephone']]];
+					$contact->groups = [['name'=>'Web Site']];
+					$this->model_tool_remarketing->sendEsputnik($contact, $create_contact_url);
+				}
+			}
+			$this->session->data['remarketing_register'] = true;
+		}
+		]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/information/contact.php">
+	<operation error="skip">
+      <search><![CDATA[$mail->send();]]></search>
+      <add position="after">
+	  <![CDATA[
+	    // remarketing all in one
+		$this->load->model('tool/remarketing');
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			if($this->config->get('remarketing_facebook_status') && $this->config->get('remarketing_facebook_server_side') && $this->config->get('remarketing_facebook_token')) {
+				$facebook_data['event_name'] = 'Contact';
+				$fb_time = time();
+				$facebook_data['custom_data'] = [];
+				$facebook_data['time'] = $fb_time;
+				$this->model_tool_remarketing->sendFacebook($facebook_data);
+			}
+			$this->session->data['remarketing_contact'] = true;
+		}
+		]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/checkout/simplecheckout_cart.php">
+	<operation error="skip">
+      <search><![CDATA[$this->_templateData['vouchers'] = array();]]></search>
+      <add position="after">
+	  <![CDATA[
+// remarketing all in one
+$this->load->model('tool/remarketing');
+if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+	$cart_total = $this->cart->getTotal();
+	$this->load->model('catalog/product');
+	$facebook_currency = $this->config->get('remarketing_facebook_currency');
+	$ecommerce_currency = $this->config->get('remarketing_ecommerce_currency');
+	$tiktok_currency = $this->config->get('remarketing_tiktok_currency');
+	$facebook_totalvalue = $this->currency->format($cart_total, $facebook_currency, '', false); 
+	$tiktok_totalvalue = $this->currency->format($cart_total, $tiktok_currency, '', false); 
+	$ga4_totalvalue = $this->currency->format($cart_total, $ecommerce_currency, '', false); 
+	$facebook_id = $this->config->get('remarketing_facebook_id') == 'id' ? 'product_id' : 'model';
+	$tiktok_id = $this->config->get('remarketing_tiktok_id') == 'id' ? 'product_id' : 'model';
+			
+	$data['facebook_ids'] = [];
+	$data['tiktok_ids'] = [];
+	foreach ($products as $product) {
+		$data['facebook_ids'][] = $product;
+		$data['tiktok_ids'][] = $product;
+	} 
+	$this->_templateData['facebook_output'] = '';
+	$this->_templateData['gtag_output'] = '';
+	$this->_templateData['ga4_output'] = '';
+	$this->_templateData['tiktok_output'] = '';
+	if ($this->config->get('remarketing_facebook_status') && $this->config->get('remarketing_facebook_identifier') && $this->config->get('remarketing_facebook_pixel_status')) {
+		if (!empty($data['facebook_ids'])) {
+			$this->_templateData['facebook_output'] .= "<script>" . "\n";
+			$this->_templateData['facebook_output'] .= "facebook_payment_data = {" . "\n";	
+			$this->_templateData['facebook_output'] .= "content_type: 'product'," . "\n";
+			$num_items = 0;
+			foreach ($data['facebook_ids'] as $product) {
+				$num_items += $product['quantity'];
+			}
+			$this->_templateData['facebook_output'] .= "num_items: " . $num_items . "," . "\n";
+			$this->_templateData['facebook_output'] .= "contents: [" . "\n";
+			foreach ($data['facebook_ids'] as $product) {
+				$this->_templateData['facebook_output'] .= "{" . "'id': '" . $product[$facebook_id] . "', 'price': " . $this->currency->format($product['price'], $facebook_currency, '', false) . ", 'quantity': " . $product['quantity'] . "},";
+			}
+			$this->_templateData['facebook_output'] = rtrim($this->_templateData['facebook_output'], ',');
+			$this->_templateData['facebook_output'] .= "],\n";
+			$this->_templateData['facebook_output'] .= 'value: ' . $facebook_totalvalue . ',' . "\n";
+			$this->_templateData['facebook_output'] .= "currency: '" .  $facebook_currency . "'" . "\n";
+			$this->_templateData['facebook_output'] .= "}</script>";
+		}
+	}
+	
+	if ($this->config->get('remarketing_tiktok_status') && $this->config->get('remarketing_tiktok_identifier') && $this->config->get('remarketing_tiktok_pixel_status')) {
+		if (!empty($data['tiktok_ids'])) {
+			$this->_templateData['tiktok_output'] .= "<script>" . "\n";
+			$this->_templateData['tiktok_output'] .= "tiktok_payment_data = {" . "\n";	
+			$this->_templateData['tiktok_output'] .= "content_type: 'product'," . "\n";
+			$this->_templateData['tiktok_output'] .= "contents: [" . "\n";
+			foreach ($data['facebook_ids'] as $product) {
+				$this->_templateData['tiktok_output'] .= "{" . "'content_id': '" . $product[$tiktok_id] . "', 'price': " . $this->currency->format($product['price'], $tiktok_currency, '', false) . ", 'quantity': " . $product['quantity'] . ", 'content_type': 'product'},";
+			}
+			$this->_templateData['tiktok_output'] = rtrim($this->_templateData['tiktok_output'], ',');
+			$this->_templateData['tiktok_output'] .= "],\n";
+			$this->_templateData['tiktok_output'] .= 'value: ' . $tiktok_totalvalue . ',' . "\n";
+			$this->_templateData['tiktok_output'] .= "currency: '" .  $tiktok_currency . "'" . "\n";
+			$this->_templateData['tiktok_output'] .= "}</script>";
+		}
+	}
+	
+	if ($this->config->get('remarketing_ecommerce_ga4_status')) {
+		$ga4_event = [];
+		$ga4_event['currency'] = $ecommerce_currency;
+		$ga4_event['send_to'] = $this->config->get('remarketing_ecommerce_ga4_identifier');
+		$ga4_event['value'] = $ga4_totalvalue;
+		if (!empty($this->session->data['coupon'])) $ga4_event['coupon'] = $this->session->data['coupon'];
+		if (!empty($this->session->data['payment_method']['title'])) $ga4_event['payment_type'] = $this->session->data['payment_method']['title'];
+		$list_products = [];
+		foreach ($products as $product) {
+			$product_info = $this->model_catalog_product->getProduct($product['product_id']);
+			$ga4_categories = $this->model_tool_remarketing->getRemarketingCategoriesGa4($product['product_id']);
+			
+			$ga4_product = [
+				'item_id' => $this->config->get('remarketing_ecommerce_ga4_id') == 'id' ? $product_info['product_id'] : $product_info['model'],
+				'item_name' => addslashes($product['name']),
+				'quantity' => $product['quantity'],
+				'price' => $this->currency->format($product['price'], $ecommerce_currency, '', false),
+				'currency' => $ecommerce_currency
+			];
+			
+			if (!empty($ga4_categories[0])) $ga4_product['item_category'] = $ga4_categories[0];
+			if (!empty($ga4_categories[1])) $ga4_product['item_category2'] = $ga4_categories[1];
+			if (!empty($ga4_categories[2])) $ga4_product['item_category3'] = $ga4_categories[2];
+			if (!empty($ga4_categories[3])) $ga4_product['item_category4'] = $ga4_categories[3];
+			if (!empty($product_info['manufacturer'])) $ga4_product['item_brand'] = $product_info['manufacturer'];
+			$list_products[] = $ga4_product;
+		}
+		
+		$ga4_event['items'] = $list_products; 
+		
+		if (!empty($ga4_event)) {
+			$this->_templateData['ga4_output'] .= "<script>" . "\n";
+			$this->_templateData['ga4_output'] .= "ga4_payment_data = " . json_encode($ga4_event) . ";\n";	
+			$this->_templateData['ga4_output'] .= "</script>";
+		}
+	}
+} 
+	]]>
+      </add>
+    </operation>
+  </file>
+  <file path="admin/controller/sale/order.php">
+	<operation error="skip">
+      <search><![CDATA[public function info() {]]></search>
+      <add position="after">
+	  <![CDATA[
+	    // remarketing all in one
+	    $data['remarketing_data'] = [];
+		if ($this->config->get('remarketing_show_in_order') && isset($this->request->get['order_id'])) {
+			$order_id = $this->request->get['order_id'];
+			$remarketing_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "remarketing_orders` WHERE order_id = '" . (int)$order_id . "'");
+			if ($remarketing_query->num_rows) { 
+				$data['remarketing_data'] = $remarketing_query->rows[0];
+			}
+		} 
+		]]>
+      </add>
+    </operation>
+  </file>
+  <file path="admin/controller/common/column_left.php">
+	<operation error="skip">
+      <search><![CDATA[$report_sale = array();]]></search>
+      <add position="after">
+	  <![CDATA[
+	    // remarketing all in one
+			
+		if ($this->config->get('remarketing_status') && $this->user->hasPermission('access', 'report/remarketing_report')) {
+			$report[] = array(
+				'name'	   => $this->language->get('text_remarketing_report'),
+				'href'     => $this->url->link('report/remarketing_report', 'token=' . $this->session->data['token'], true),
+				'children' => [] 
+			);			
+		}
+		]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[if ($this->user->hasPermission('access', 'report/report')) {]]></search>
+      <add position="before">
+	  <![CDATA[
+	    // remarketing all in one
+			
+		if ($this->config->get('remarketing_status') && $this->user->hasPermission('access', 'report/remarketing_report')) {
+			$report[] = array( 
+				'name'	   => $this->language->get('text_remarketing_report'),
+				'href'     => $this->url->link('report/remarketing_report', 'user_token=' . $this->session->data['user_token'], true),
+				'children' => [] 
+			);			
+		}
+		]]>
+      </add>
+    </operation>
+  </file>
+  <file path="admin/language/*/common/column_left.php">
+	<operation error="skip">
+      <search><![CDATA[$_['text_report_sale']]]></search>
+      <add position="before">
+	  <![CDATA[
+	  $_['text_remarketing_report'] = 'SP SEO Remarketing Report';
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/model/extension/module/{newfastorder,luxshop_newfastorder,cyber_newfastorder}.php">
+        <operation error="skip">
+            <search><![CDATA[comment 			= ''");]]></search>
+            <add position="after"><![CDATA[
+        return $order_id;
+			]]></add>
+        </operation>
+    </file>
+  <file path="catalog/model/extension/module/{newfastordercart,luxshop_newfastordercart,cyber_newfastordercart}.php">
+        <operation error="skip">
+            <search><![CDATA[comment = ''");]]></search>
+            <add position="after"><![CDATA[
+        return $order_id;
+			]]></add>
+        </operation>
+    </file>
+  <file path="catalog/controller/extension/module/{newfastorder,luxshop_newfastorder,cyber_newfastorder,chameleon_newfastorder}.php">
+        <operation error="skip">
+            <search><![CDATA[$product_info = $this->model_catalog_product->getProduct($product_id);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$data['quick'] = json_encode($this->model_tool_remarketing->getQuickOrderOpen($product_info));
+			}
+			]]></add>
+        </operation>
+  </file> 
+  <file path="catalog/controller/extension/module/luxshop_newfastorder.php">
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_extension_module_luxshop_newfastorder->addOrder($data, $product_options);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($results, true);
+			}
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/extension/module/luxshop_newfastordercart.php">
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_extension_module_luxshop_newfastordercart->addOrder($data);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($results, true);
+			}
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/extension/module/cyber_newfastorder.php">
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_extension_module_cyber_newfastorder->addOrder($data, $product_options);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($results, true);
+			}
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/extension/module/cyber_newfastordercart.php">
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_extension_module_cyber_newfastordercart->addOrder($data);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($results, true);
+			}
+			]]></add>
+        </operation>
+    </file>
+	<file path="catalog/controller/extension/module/newfastorder.php">
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_extension_module_newfastorder->addOrder($data, $product_options);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($results, true);
+			}
+			]]></add>
+        </operation>
+    </file>
+	<file path="catalog/controller/extension/module/newfastordercart.php">
+        <operation error="skip">
+            <search><![CDATA[$results = $this->model_extension_module_newfastordercart->addOrder($data);]]></search>
+            <add position="after"><![CDATA[
+			if ($this->config->get('remarketing_status')) {
+				$this->load->model('tool/remarketing');
+				$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($results, true);
+			}
+			]]></add>
+        </operation>
+    </file>
+	  <file path="catalog/controller/extension/module/chameleon_newfastorder.php">
+  	     <operation error="skip">
+            <search><![CDATA[$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'));]]></search>
+			<add position="after">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id);
+		}
+	  ]]>
+		  </add>
+      </operation>
+    </file>
+	<file path="catalog/controller/extension/module/chameleon_newfastordercart.php">
+		<operation error="skip">
+			<search><![CDATA[$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'));]]></search>
+			<add position="after">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id);
+		}
+	  ]]>
+		  </add>
+        </operation>
+    </file>
+	<file path="catalog/controller/extension/module/{cyber,luxshop,chameleon}_found_cheaper_product.php">
+		<operation error="skip">
+			<search><![CDATA[$json['success'] = $this->language->get('text_success_send');]]></search>
+			<add position="before">
+      <![CDATA[
+		// remarketing all in one
+		$this->load->model('tool/remarketing');
+	    if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$json['remarketing'] = $this->model_tool_remarketing->remarketingFoundCheaper(); 
+		}
+	  ]]>
+		  </add>
+        </operation>
+    </file>
+	<file path="catalog/controller/octemplates/module/oct_popup_purchase.php">
+	    <operation error="skip">
+			<search><![CDATA[$data['sku'] = $product_info['sku'];]]></search>
+				<add position="before">
+      <![CDATA[
+	if ($this->config->get('remarketing_status')) {
+		$this->load->model('tool/remarketing');
+		$data['quick'] = json_encode($this->model_tool_remarketing->getQuickOrderOpen($product_info));
+	}
+	]]>
+			</add>
+        </operation>
+	    <operation error="skip">
+		   <search><![CDATA[$json['success'] = sprintf($this->language->get('text_success_order'), $order_id);]]></search>
+			  <add position="before">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id);
+		}
+	  ]]>
+		    </add>
+      </operation>
+  </file>
+  <file path="catalog/controller/{checkout,octemplates/module}/{oct_popup_cart,oct_fastorder}.php">
+	<operation error="skip">
+      <search><![CDATA[if (isset($this->request->request['remove'])) {]]></search>
+      <add position="after">
+      <![CDATA[
+		// remarketing all in one
+		$this->load->model('tool/remarketing');
+	    if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$this->load->model('catalog/product');
+			$product_info = [];
+			foreach ($this->cart->getProducts() as $product) {
+				if ($product['cart_id'] == $this->request->request['remove']) {
+					$product_info = $this->model_catalog_product->getProduct($product['product_id']);
+					$quantity = $product['quantity'];
+					$this->session->data['remarketing_remove_event'] = $this->model_tool_remarketing->remarketingRemoveFromCart($product_info, $quantity);
+				} 
+			}
+		}
+	  ]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[$json['total_amount'] =]]></search>
+      <add position="after">
+      <![CDATA[
+		if (!empty($this->session->data['remarketing_remove_event'])) {
+			$json['remarketing'] = $this->session->data['remarketing_remove_event'];
+			unset($this->session->data['remarketing_remove_event']);
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/octemplates/module/oct_popup_call_phone.php">
+	<operation error="skip">
+      <search><![CDATA[$json['output'] = $this->language->get('text_success_send');]]></search>
+      <add position="before">
+      <![CDATA[
+		// remarketing all in one
+		$this->load->model('tool/remarketing');
+	    if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$json['remarketing'] = $this->model_tool_remarketing->remarketingCallback(); 
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/extension/module/{luxshop,cyber,chameleon}_callback.php">
+	<operation error="skip">
+      <search><![CDATA[$json['success'] = $this->language->get('ok');]]></search>
+      <add position="before">
+      <![CDATA[
+		// remarketing all in one
+		$this->load->model('tool/remarketing');
+	    if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			$json['remarketing'] = $this->model_tool_remarketing->remarketingCallback(); 
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/model/octemplates/module/oct_subscribe.php">
+	  <operation error="skip">
+		  <search><![CDATA[$link = $this->url->link('octemplates/module/oct_subscribe/subscribe_confirm', 'unsubscribe=' . (int)$subscribe_id . '&hash='.$subscribe_info['hash'], true);]]></search>
+			  <add position="after">
+      <![CDATA[
+        // remarketing all in one 
+		$this->load->model('tool/remarketing');
+		if ($this->config->get('remarketing_status') && !$this->model_tool_remarketing->isBot()) {
+			if ($this->config->get('remarketing_esputnik_status')) {
+				$data['newsletter'] = '1';
+				$data['email'] = $subscribe_info['email'];
+				$data['firstname'] = 'Подписчик';
+				$data['lastName'] = time();
+				$data['lastName'] = time(); 
+				$customer_id = time();
+				if (isset($data['newsletter']) && $data['newsletter']) {
+					$create_contact_url = 'https://esputnik.com/api/v1/contact/subscribe';
+					$json_contact_value = new stdClass();
+					$contact = new stdClass();
+					$contact->firstName = $data['firstname'];
+					$contact->lastName = $data['lastname'];
+					$contact->contactKey = $customer_id;
+					$contact->id = $customer_id;
+					$contact->channels = [['type'=>'email', 'value' => $data['email']]];
+					$contact->groups = [['name'=>'Web Site']];
+					$json_contact_value->contact = $contact;
+					$json_contact_value->groups = ['Subscribers'];
+					$this->model_tool_remarketing->sendEsputnik($json_contact_value, $create_contact_url);
+				} 
+			}
+		}
+		]]>
+			</add>
+		</operation>
+    </file>
+	<file path="catalog/controller/extension/module/uni_quick_order.php">
+		<operation error="skip">
+			<search><![CDATA[$data['comment_text'] = $uniset[$lang_id]['quick_order_comment_text'];]]></search>
+				<add position="after">
+      <![CDATA[
+	if ($this->config->get('remarketing_status')) {
+		$this->load->model('tool/remarketing');
+		$data['quick'] = json_encode($this->model_tool_remarketing->getQuickOrderOpen($product_info));
+		
+	}
+	]]>
+    </add>
+    </operation>
+	<operation error="skip">
+        <search><![CDATA[$json['success']['order_id'] = $this->addOrder($user_data);]]></search>
+			<add position="after">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($json['success']['order_id']);
+		}
+	  ]]>
+		  </add>
+      </operation>
+  </file>
+  <file path="catalog/controller/revolution/revpopuporder.php">
+	<operation error="skip">
+      <search><![CDATA[$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $order_status_id);]]></search>
+      <add position="after">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id);
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/revolution/revpopupcartquick.php">
+	<operation error="skip">
+      <search><![CDATA[$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $order_status_id);]]></search>
+      <add position="after">
+    <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id);
+		}
+	]]>
+      </add>
+    </operation>
+	</file>
+	<file path="catalog/controller/extension/module/aridius_fastorder.php">
+	<operation error="skip">
+      <search><![CDATA[$this->model_extension_module_aridiusfastorder->addOrderHistory($order_id);]]></search> 
+      <add position="before">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id, true);
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/controller/extension/module/aridiusfastorder.php">
+	<operation error="skip">
+      <search><![CDATA[$json['success'] = $this->language->get('text_success');]]></search>
+      <add position="before">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$order_id = $this->model_tool_remarketing->makeRemarketingOrder($firstname, $contact, $email, $comment, $product_id, $quantity_formated);
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id, true);
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file> 
+</modification>

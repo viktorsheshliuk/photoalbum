@@ -1,0 +1,31 @@
+.contact-page__heading{margin:0 -5px 15px;color:#666}
+.contact-page__form{margin:0 0 30px}
+.contact-page__form .captcha__title{width:16.666666%;text-align:right}
+.contact-page__form .captcha__wrapper{width:40%}
+
+.contacts{margin:0 0 30px}
+.contacts__heading{margin:0 0 10px;font-weight:700;font-size:1.2em}
+.contacts__address{margin:0 40px 20px 0}
+.contact-list__address{margin:0 0 25px}
+.contact-list__open{margin:0}
+.contact-list__item{display:flex;align-items:center;margin:0 0 7px;font-weight:500;color:#888}
+.contact-list__icon{margin:0 7px 0 0}
+.contact-list__icon.fa-phone-alt{font-size:.85em}
+.contacts__contacts{min-width:200px;margin:0 0 20px}
+.contacts__contacts .contact-list__item {white-space:nowrap}
+.contact-list .contact-list__item:hover span{text-decoration:underline;cursor:pointer}
+.contacts__comment{margin: 0 0 30px}
+.contacts__map{position:sticky;top:60px}
+.contact-locations{margin-bottom:20px}
+.contact-locations__item{margin:0 0 20px}
+.contact-locations__image{margin:-15px -15px 15px}
+.contact-locations__image img{border-radius:4px 4px 0 0}
+.contact-locations__ul{list-style:none;padding:0;margin:0}
+.contact-locations__li:nth-child(odd){font-weight:500}
+.contact-locations__li:nth-child(even){color:#888}
+.contact-locations__li:nth-child(even):not(:last-child){margin:0 0 10px}
+
+
+@media (min-width:1200px){
+	.contacts__address{width:50%}
+}
