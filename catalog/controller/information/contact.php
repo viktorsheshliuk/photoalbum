@@ -7,6 +7,11 @@ class ControllerInformationContact extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
+		if ($this->request->server['REQUEST_METHOD'] == 'POST' && !empty($this->request->post['hp_field'])) {
+			// бот: делаем вид, что всё ок
+			$this->response->redirect($this->url->link('information/contact/success'));
+		}
+
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 			$mail = new Mail($this->config->get('config_mail_engine'));
 			$mail->parameter = $this->config->get('config_mail_parameter');
@@ -17,12 +22,15 @@ class ControllerInformationContact extends Controller {
 			$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
 
 			$mail->setTo($this->config->get('config_email'));
-			$mail->setFrom($this->request->post['email']);
+			// $mail->setFrom($this->request->post['email']);
+			$mail->setFrom($this->config->get('config_email'));
 			$mail->setReplyTo($this->request->post['email']);
 			$mail->setSender(html_entity_decode($this->request->post['name'], ENT_QUOTES, 'UTF-8'));
 			$mail->setSubject(html_entity_decode(sprintf($this->language->get('email_subject'), $this->request->post['name'] . ' (' . $this->request->post['email'] . ')'), ENT_QUOTES, 'UTF-8'));
 			$mail->setText($this->request->post['enquiry']);
 			$mail->send();
+
+			unset($this->session->data['contact_ts']); // одна отправка на одно открытие формы
 
 			$this->response->redirect($this->url->link('information/contact/success'));
 		}
@@ -58,6 +66,10 @@ class ControllerInformationContact extends Controller {
 		}
 
 		$data['button_submit'] = $this->language->get('button_submit');
+
+		if (empty($this->session->data['contact_ts'])) {
+			$this->session->data['contact_ts'] = time();
+		}
 
 		$data['action'] = $this->url->link('information/contact', '', true);
 
@@ -142,15 +154,23 @@ class ControllerInformationContact extends Controller {
 	}
 	
 	protected function validate() {
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
+		$started = isset($this->session->data['contact_ts']) ? (int)$this->session->data['contact_ts'] : 0;
+
+		if (!$started || (time() - $started) < 4) {
+			$this->error['enquiry'] = 'Не вдалося відправити форму. Спробуйте ще раз.';
+		}
+
+		$name = $this->request->post['name'] ?? '';
+		$email = $this->request->post['email'] ?? '';
+		$enquiry = $this->request->post['enquiry'] ?? '';
+
+		if ((utf8_strlen($name) < 3) || (utf8_strlen($name) > 32)) {
 			$this->error['name'] = $this->language->get('error_name');
 		}
-
-		if (!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 			$this->error['email'] = $this->language->get('error_email');
 		}
-
-		if ((utf8_strlen($this->request->post['enquiry']) < 10) || (utf8_strlen($this->request->post['enquiry']) > 3000)) {
+		if ((utf8_strlen($enquiry) < 10) || (utf8_strlen($enquiry) > 3000)) {
 			$this->error['enquiry'] = $this->language->get('error_enquiry');
 		}
 
